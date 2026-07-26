@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>都道府県シルエットクイズ！ | しょうがくせい向け</title>
+    <meta name="description" content="日本の都道府県の形（シルエット）をあてる、楽しくてためになる小学生向けクイズゲーム！全10問に挑戦しよう！">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Google Fonts: M PLUS Rounded 1c (丸みがあって親しみやすいフォント) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- config.js からGoogle Tag Manager IDを読み込み -->
+    <script src="config.js"></script>
+    <script>
+        // Google タグマネージャー (gtag.js) の動的読み込み
+        (function() {
+            var tagId = (window.GTAG_ID) ? window.GTAG_ID : 'G-S6QX2XHT2D';
+            var script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + tagId;
+            document.head.appendChild(script);
+
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){ dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', tagId);
+        })();
+    </script>
+</head>
+<body>
+    <div class="background-decorations">
+        <div class="floating-shape shape-1">🗾</div>
+        <div class="floating-shape shape-2">⭐</div>
+        <div class="floating-shape shape-3">🌸</div>
+        <div class="floating-shape shape-4">富士山</div>
+        <div class="floating-shape shape-5">🎒</div>
+        <div class="floating-shape shape-6">✨</div>
+    </div>
+
+    <main class="app-container">
+        <!-- 音声ON/OFF切り替えボタン -->
+        <header class="app-header">
+            <button id="sound-toggle" class="icon-btn" aria-label="効果音切り替え">
+                <span id="sound-icon">🔊</span> 効果音: <span id="sound-state">ON</span>
+            </button>
+        </header>
+
+        <!-- 1. スタート画面 -->
+        <section id="start-screen" class="card screen active">
+            <div class="title-badge">日本ちずマスター</div>
+            <h1 class="main-title">
+                <span class="title-sub">形（かたち）でおぼえる！</span><br>
+                都道府県<br>シルエットクイズ！
+            </h1>
+            <div class="mascot-box">
+                <div class="mascot-img">🗺️</div>
+                <p class="mascot-bubble">日本全国47都道府県の「形」がでるよ！きみはいくつ当てられるかな？</p>
+            </div>
+            
+            <div class="rule-box">
+                <div class="rule-item">
+                    <span class="rule-icon">❓</span>
+                    <span>ぜんぶで <strong>10問</strong> 出題！</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-icon">⏱️</span>
+                    <span>1問の制限時間は <strong>30秒</strong>！</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-icon">🎯</span>
+                    <span>4つの選択肢から選ぼう！</span>
+                </div>
+            </div>
+
+            <button id="start-btn" class="btn btn-primary pulse-btn">
+                <span>クイズをはじめる！</span> 🚀
+            </button>
+        </section>
+
+        <!-- 2. クイズ画面 -->
+        <section id="quiz-screen" class="card screen">
+            <!-- 進行度 ＆ スコア表示 -->
+            <div class="quiz-info-bar">
+                <div class="progress-badge">
+                    もんだい <span id="current-question-num">1</span> / <span id="total-questions-num">10</span>
+                </div>
+                <div class="score-badge">
+                    てんすう: <span id="current-score">0</span> 点
+                </div>
+            </div>
+
+            <!-- タイマーバー -->
+            <div class="timer-container">
+                <div class="timer-label">
+                    <span>⏱️ のこり時間</span>
+                    <span id="timer-text">30秒</span>
+                </div>
+                <div class="timer-bar-outer">
+                    <div id="timer-bar-inner" class="timer-bar-inner"></div>
+                </div>
+            </div>
+
+            <!-- 問題：シルエット表示 -->
+            <div class="question-box">
+                <div class="silhouette-card">
+                    <div id="silhouette-container" class="silhouette-svg-wrapper">
+                        <!-- SVG silhouette dynamically inserted -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4択選択肢 -->
+            <div class="options-grid" id="options-container">
+                <button class="btn option-btn" data-index="0">選択肢 1</button>
+                <button class="btn option-btn" data-index="1">選択肢 2</button>
+                <button class="btn option-btn" data-index="2">選択肢 3</button>
+                <button class="btn option-btn" data-index="3">選択肢 4</button>
+            </div>
+        </section>
+
+        <!-- 3. 結果画面 -->
+        <section id="result-screen" class="card screen">
+            <div class="result-header">
+                <div id="result-emoji" class="result-emoji">🎉</div>
+                <h2 id="result-title" class="result-title">けっかはっぴょう！</h2>
+            </div>
+
+            <div class="score-card">
+                <div class="score-main">
+                    <span id="final-score" class="score-num">0</span>
+                    <span class="score-unit">/ 100 点</span>
+                </div>
+                <div id="rank-badge" class="rank-badge">都道府県マスター</div>
+                <p id="result-message" class="result-message">素晴らしい！完璧な知識です！</p>
+            </div>
+
+            <!-- ふりかえりリスト -->
+            <div class="review-container">
+                <h3 class="review-title">🔍 ふりかえり（出題された都道府県）</h3>
+                <div id="review-list" class="review-list">
+                    <!-- Review items dynamically generated -->
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button id="restart-btn" class="btn btn-primary">
+                    もういちど あそぶ！ 🔄
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>© 都道府県シルエットクイズ！ | 小学生向け楽しく学べるWebアプリ</p>
+    </footer>
+
+    <!-- Canvas for Confetti animation -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
