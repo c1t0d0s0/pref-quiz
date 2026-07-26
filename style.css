@@ -1,5 +1,5 @@
 /* ==========================================================================
-   都道府県シルエットクイズ - Style Sheet
+   都道府県シルエット＆ちしきクイズ - Style Sheet
    明るくポップで親しみやすい小学生向けデザイン
    ========================================================================== */
 
@@ -150,7 +150,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   1. スタート画面
+   1. スタート画面 ＆ モード選択
    -------------------------------------------------------------------------- */
 .title-badge {
     background: var(--accent-purple);
@@ -164,7 +164,7 @@ body {
 }
 
 .main-title {
-    font-size: 2.2rem;
+    font-size: 2.1rem;
     font-weight: 900;
     color: #FF3366;
     line-height: 1.25;
@@ -173,7 +173,7 @@ body {
 }
 
 .title-sub {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: #35A7FF;
     text-shadow: none;
     display: inline-block;
@@ -205,6 +205,64 @@ body {
     color: #4A4E69;
     text-align: left;
     line-height: 1.4;
+}
+
+/* モード選択タブ */
+.mode-select-section {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.mode-select-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.mode-select-container {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.mode-btn {
+    flex: 1;
+    background: #F1F5F9;
+    border: 3px solid #CBD5E1;
+    color: var(--text-muted);
+    padding: 10px 4px;
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+    background: #E2E8F0;
+    transform: translateY(-2px);
+}
+
+.mode-btn.active {
+    background: #FFE600;
+    border-color: #FFC700;
+    color: #2B2D42;
+    box-shadow: 0 4px 0px #E5B200;
+    transform: translateY(-2px);
+}
+
+.mode-icon {
+    font-size: 1.3rem;
+}
+
+.mode-name {
+    font-size: 0.85rem;
 }
 
 .rule-box {
@@ -272,7 +330,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   2. クイズ画面
+   2. クイズ画面 ＆ 問題カード
    -------------------------------------------------------------------------- */
 .quiz-info-bar {
     width: 100%;
@@ -286,18 +344,27 @@ body {
     background: #E0F2FE;
     color: #0284C7;
     font-weight: 900;
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 50px;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
+}
+
+.mode-type-badge {
+    background: #F3E8FF;
+    color: #7E22CE;
+    font-weight: 900;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.95rem;
 }
 
 .score-badge {
     background: #FEF3C7;
     color: #D97706;
     font-weight: 900;
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 50px;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
 }
 
 /* タイマーバー */
@@ -341,12 +408,13 @@ body {
     to { opacity: 0.5; }
 }
 
-/* シルエットカード */
+/* 問題ボックス */
 .question-box {
     width: 100%;
     margin-bottom: 20px;
 }
 
+/* 1. シルエットカード */
 .silhouette-card {
     background: radial-gradient(circle, #F8FAFC 0%, #E2E8F0 100%);
     border: 4px solid #CBD5E1;
@@ -363,7 +431,7 @@ body {
 .silhouette-svg-wrapper {
     width: 100%;
     max-width: 260px;
-    height: 240px;
+    height: 230px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -377,13 +445,63 @@ body {
 }
 
 .silhouette-svg-wrapper path {
-    fill: #1E293B; /* ダークなシルエット色 */
+    fill: #1E293B;
     transition: fill 0.4s ease;
 }
 
-/* 正解発表時のシルエットオープン演出 */
 .silhouette-svg-wrapper.revealed path {
     fill: #FF5964;
+}
+
+/* 2. 知識クイズカード */
+.knowledge-card {
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border: 4px solid #7DD3FC;
+    border-radius: var(--border-radius-md);
+    padding: 24px 20px;
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03);
+    position: relative;
+}
+
+.knowledge-category {
+    background: #0284C7;
+    color: #FFFFFF;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 4px 16px;
+    border-radius: 50px;
+    letter-spacing: 0.5px;
+}
+
+.knowledge-text {
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1.5;
+    color: var(--text-main);
+    word-break: break-word;
+}
+
+.knowledge-explanation {
+    background: #FFFFFF;
+    border: 2px solid #38BDF8;
+    color: #0369A1;
+    font-size: 0.9rem;
+    font-weight: 800;
+    padding: 8px 14px;
+    border-radius: var(--border-radius-sm);
+    line-height: 1.4;
+    animation: fadeInExp 0.3s ease;
+}
+
+@keyframes fadeInExp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* 4択グリッド */
@@ -423,7 +541,6 @@ body {
     box-shadow: 0 2px 0px #CBD5E1;
 }
 
-/* 選択後の正解・不正解アニメーション */
 .option-btn.correct {
     background: #DCFCE7 !important;
     border-color: #22C55E !important;
@@ -538,13 +655,12 @@ body {
 .review-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    max-height: 220px;
+    gap: 10px;
+    max-height: 240px;
     overflow-y: auto;
     padding-right: 6px;
 }
 
-/* カスタムスクロールバー */
 .review-list::-webkit-scrollbar {
     width: 6px;
 }
@@ -557,10 +673,10 @@ body {
     background: #F8FAFC;
     border: 2px solid #E2E8F0;
     border-radius: var(--border-radius-sm);
-    padding: 10px 14px;
+    padding: 12px 14px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 4px;
     font-size: 0.95rem;
     font-weight: 800;
 }
@@ -575,6 +691,12 @@ body {
     background: #FEF2F2;
 }
 
+.review-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .review-pref {
     display: flex;
     align-items: center;
@@ -585,15 +707,13 @@ body {
     font-size: 1.1rem;
 }
 
-.review-region {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    background: #E2E8F0;
-    padding: 2px 8px;
-    border-radius: 10px;
+.review-explanation-text {
+    font-size: 0.82rem;
+    color: #475569;
+    font-weight: 700;
+    margin-top: 2px;
 }
 
-/* Confetti Canvas */
 #confetti-canvas {
     position: fixed;
     top: 0;
@@ -604,7 +724,6 @@ body {
     z-index: 99;
 }
 
-/* フッター */
 .app-footer {
     font-size: 0.85rem;
     font-weight: 700;
@@ -613,9 +732,6 @@ body {
     text-align: center;
 }
 
-/* --------------------------------------------------------------------------
-   レスポンシブ（スマホ対応）
-   -------------------------------------------------------------------------- */
 @media (max-width: 480px) {
     body {
         padding: 10px;
@@ -636,6 +752,15 @@ body {
 
     .silhouette-svg-wrapper {
         height: 180px;
+    }
+
+    .knowledge-card {
+        min-height: 190px;
+        padding: 16px 14px;
+    }
+
+    .knowledge-text {
+        font-size: 1.15rem;
     }
 
     .options-grid {
