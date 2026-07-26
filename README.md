@@ -10,10 +10,10 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
-  - 💡 **Knowledge Quiz (ちしき)**: 500+ trivia questions covering geography, landmarks, specialties, population, and records.
+  - 💡 **Knowledge Quiz (ちしき)**: 600+ trivia questions covering geography, landmarks, specialties, population, and records.
   - 🌟 **Mix Quiz (ミックス)**: A fun 10-question random combination of silhouette and knowledge questions.
-- 🗺️ **47 Japanese Prefecture SVG Silhouettes**: High-resolution, smooth SVG vector shapes for all 47 prefectures in Japan (with optimized mainland focus for Tokyo).
-- 📚 **500+ Knowledge Question Stock**: Comprehensive database of 517 trivia questions covering every prefecture across Japan.
+- 🗺️ **47 Japanese Prefecture SVG Silhouettes**: High-resolution, smooth SVG vector shapes for all 47 prefectures in Japan.
+- 📚 **External Questions Dataset (`questions.json`)**: Modularized JSON dataset containing 605 curated, leak-free, and unambiguous trivia questions.
 - 🎯 **10-Question Random Quiz**: Each session presents 10 questions with a 30-second countdown timer.
 - 🧠 **Smart Shape-Similarity Algorithm**: Distractor options are intelligently picked based on shape similarity to provide a fun and challenging experience.
 - 🎨 **Bright & Pop Kid-Friendly Design**: Vibrant pastel color scheme, playful animations, and clean rounded typography ([M PLUS Rounded 1c](https://fonts.google.com/specimen/M+PLUS+Rounded+1c)).
@@ -30,7 +30,8 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 pref-quiz/
 ├── index.html        # Main HTML skeleton, mode selection UI & GTM tag initializer
 ├── style.css         # Styling, animations, and responsive design system
-├── script.js        # Core quiz logic, SVG dataset, 517 knowledge questions, sound synth, and confetti
+├── script.js        # Core quiz logic, SVG dataset, sound synth, and confetti
+├── questions.json    # JSON dataset containing 605 knowledge quiz questions
 ├── config.js         # Configuration file for GTM Measurement ID (Ignored by Git)
 ├── .gitignore        # Git ignore rules (ignores config.js and PROMPT.txt)
 ├── README.md         # Documentation in English
