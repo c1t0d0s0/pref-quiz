@@ -695,9 +695,9 @@ class QuizApp {
             await this.startQuiz();
         });
 
-        this.restartBtn.addEventListener('click', async () => {
+        this.restartBtn.addEventListener('click', () => {
             sfx.init();
-            await this.startQuiz();
+            this.showScreen(this.startScreen);
         });
 
         this.soundToggleBtn.addEventListener('click', () => {
@@ -842,15 +842,22 @@ class QuizApp {
     }
 
     renderOptions(options, correctPref) {
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
         this.optionsContainer.innerHTML = '';
         
         options.forEach((pref) => {
             const btn = document.createElement('button');
+            btn.type = 'button';
             btn.className = 'btn option-btn';
             btn.innerHTML = `<span class="option-name">${pref.name}</span>`;
             
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
                 if (this.isAnswering) return;
+                if (e.currentTarget && typeof e.currentTarget.blur === 'function') {
+                    e.currentTarget.blur();
+                }
                 this.handleAnswer(pref, correctPref, btn);
             });
 
@@ -899,7 +906,10 @@ class QuizApp {
         const allOptionBtns = this.optionsContainer.querySelectorAll('.option-btn');
 
         // すべてのボタンを非活性化
-        allOptionBtns.forEach(btn => btn.disabled = true);
+        allOptionBtns.forEach(btn => {
+            btn.disabled = true;
+            if (typeof btn.blur === 'function') btn.blur();
+        });
 
         if (currentQ.type === 'silhouette' && this.silhouetteContainer) {
             this.silhouetteContainer.classList.add('revealed');

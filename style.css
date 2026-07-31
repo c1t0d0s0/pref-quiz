@@ -244,9 +244,11 @@ body {
     transition: all 0.2s ease;
 }
 
-.mode-btn:hover {
-    background: #E2E8F0;
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .mode-btn:hover {
+        background: #E2E8F0;
+        transform: translateY(-2px);
+    }
 }
 
 .mode-btn.active {
@@ -297,6 +299,7 @@ body {
     font-weight: 900;
     border-radius: 50px;
     transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary {
@@ -310,9 +313,11 @@ body {
     gap: 10px;
 }
 
-.btn-primary:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .btn-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+    }
 }
 
 .btn-primary:active {
@@ -528,12 +533,16 @@ body {
     align-items: center;
     justify-content: center;
     transition: transform 0.1s ease, border-color 0.2s ease, background-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
 
-.option-btn:hover:not(:disabled) {
-    border-color: #35A7FF;
-    background: #F0F9FF;
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .option-btn:hover:not(:disabled) {
+        border-color: #35A7FF;
+        background: #F0F9FF;
+        transform: translateY(-2px);
+    }
 }
 
 .option-btn:active:not(:disabled) {
