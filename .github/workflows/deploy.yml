@@ -1,4 +1,4 @@
-# main ブランチに push されたら、ビルドをして GitHub Pages に公開する
+# main ブランチに push されたら、テスト・ビルドをして GitHub Pages に公開する
 name: Deploy to GitHub Pages
 
 on:
@@ -25,6 +25,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
       # リポジトリの変数 GTM_ID があれば、その ID で Google のタグを埋め込む (なければ埋め込まない)
       - run: npm run build
         env:

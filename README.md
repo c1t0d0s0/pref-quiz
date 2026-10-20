@@ -8,15 +8,21 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 
 ## ✨ Features
 
+- 📅 **Daily Challenge by Grade (今日のチャレンジ)**: Pick a school grade (1–6) and get 10 grade-appropriate questions every day.
+  - The same date and grade always give the same 10 questions for everyone (the date changes at midnight JST).
+  - Each grade has 100+ questions; no question repeats until the whole set has been used, and no prefecture is the answer twice on the same day.
+  - Grades 1–2 use mostly hiragana and show furigana on the choices; upper grades mix in similar-shaped prefectures as wrong choices.
+  - Cleared days and the current streak are saved in this browser (localStorage). Replays are allowed.
+- 📒 **Stamp Card (スタンプカード)**: Finishing the daily challenge stamps that day on a per-grade monthly calendar, viewable up to a year back. Each day's stamp is a prefecture silhouette chosen by date.
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
-  - 💡 **Knowledge Quiz (ちしき)**: 600+ trivia questions covering geography, landmarks, specialties, population, and records.
+  - 💡 **Knowledge Quiz (ちしき)**: 770+ trivia questions covering geography, landmarks, specialties, population, and records.
   - 🌟 **Mix Quiz (ミックス)**: A fun 10-question random combination of silhouette and knowledge questions.
 - 🗺️ **47 Japanese Prefecture SVG Silhouettes**: High-resolution, smooth SVG vector shapes for all 47 prefectures in Japan.
-- 📚 **External Questions Dataset (`questions.json`)**: Modularized JSON dataset containing 605 curated, leak-free, and unambiguous trivia questions.
+- 📚 **Per-Grade Question Data**: 773 knowledge questions kept in one JSON file per school grade (`src/data/questions/grade1.json` … `grade6.json`).
 - 🎯 **10-Question Random Quiz**: Each session presents 10 questions with a 30-second countdown timer.
 - 🧠 **Smart Shape-Similarity Algorithm**: Distractor options are intelligently picked based on shape similarity to provide a fun and challenging experience.
-- 🎨 **Bright & Pop Kid-Friendly Design**: Vibrant pastel color scheme, playful animations, and clean rounded typography ([M PLUS Rounded 1c](https://fonts.google.com/specimen/M+PLUS+Rounded+1c)).
+- 🎨 **Chalkboard Design**: A wooden-framed chalkboard look with handwritten fonts ([Klee One](https://fonts.google.com/specimen/Klee+One), [Yomogi](https://fonts.google.com/specimen/Yomogi)) and a sparrow mascot.
 - 🎵 **Web Audio Synthesizer**: Built-in sound effects (correct chime, wrong buzzer, countdown tick-tock, and fanfare) requiring no external audio assets, with an instant mute/unmute toggle.
 - 🎊 **Confetti Celebration**: Dynamic canvas confetti animation triggered upon achieving high scores (80+ points).
 - 📊 **Google Tag Integration**: At build time, a Google Analytics / Tag Manager tag is embedded when `GTM_ID` is set (env var or `config.js`).
@@ -26,38 +32,69 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 
 ## 📁 File Structure
 
+Built with [Vue 3](https://vuejs.org/) single-file components and TypeScript, bundled by [Vite](https://vite.dev/), and tested with [Vitest](https://vitest.dev/).
+
 ```text
 pref-quiz/
-├── index.html        # Main HTML skeleton & mode selection UI
-├── style.css         # Styling, animations, and responsive design system
-├── script.js        # Core quiz logic, SVG dataset, sound synth, and confetti
-├── questions.json    # JSON dataset containing 605 knowledge quiz questions
-├── config.js         # GTM_ID configuration (Ignored by Git)
-├── config.example.js # Example of config.js
-├── package.json      # Build script definition (no dependencies)
-├── scripts/build.mjs # Outputs dist/ and embeds the Google tag
-├── .github/workflows/deploy.yml # Deploys to GitHub Pages on push to main
-├── .gitignore        # Git ignore rules (config.js, PROMPT.txt, dist)
-├── README.md         # Documentation in English
-└── README.ja.md      # Documentation in Japanese
+├── index.html                  # Minimal HTML that mounts the Vue app
+├── src/
+│   ├── main.ts                 # App entry point
+│   ├── App.vue                 # Screen flow (start → quiz → result), grade, daily record
+│   ├── types.ts                # Shared types (grade, prefecture, question, quiz)
+│   ├── components/             # StartScreen, DailyPanel, QuizScreen, QuestionCard, TimerBar,
+│   │                           # ResultScreen, ReviewList, StampScreen, StampCard, StampMark, SparrowIcon
+│   ├── core/                   # UI-independent logic (easy to unit test)
+│   │   ├── quiz.ts             # Building quizzes, 4-choice options, ranks
+│   │   ├── daily.ts            # Daily challenge selection (10 questions from date and grade)
+│   │   ├── stamps.ts           # Stamp card calendar and stamp pictures
+│   │   ├── storage.ts          # Saved grade and cleared days (localStorage)
+│   │   ├── date.ts / rng.ts    # JST dates, seeded random numbers
+│   │   ├── sound.ts            # Sound effects (Web Audio API)
+│   │   └── confetti.ts         # Confetti animation
+│   ├── data/
+│   │   ├── index.ts            # Data access (import from here)
+│   │   ├── prefectures.json    # 47 prefectures (name, reading, region, capital, hint)
+│   │   ├── shapes.json         # Prefecture silhouettes (SVG paths)
+│   │   ├── similar.ts          # Similar-shaped prefectures (used as wrong choices)
+│   │   └── questions/grade1–6.json  # Knowledge questions, one file per grade
+│   └── styles/main.css         # Styles (chalkboard design)
+├── public/                     # Files served as-is (favicon.svg / favicon.ico / apple-touch-icon.png)
+├── tests/                      # Vitest tests (data, daily selection, options, quiz screen)
+├── vite.config.ts              # Vite config and Google tag injection
+├── config.example.js           # Example of config.js (config.js is git-ignored)
+└── .github/workflows/deploy.yml  # Deploys to GitHub Pages on push to main
 ```
 
 ---
 
 ## 🚀 How to Run Locally
 
-Because this project uses vanilla HTML5, CSS3, and JavaScript (ES6+), no build process or Node.js installation is required.
+Requires Node.js 24.
 
-### 1. Serve via Python HTTP Server
-Open your terminal in the project directory and run:
 ```bash
-python3 -m http.server 8080
+npm install
+npm run dev      # Dev server (http://localhost:5173) with instant reload
+npm test         # Run tests
+npm run build    # Type-check, then output the site to dist/
+npm run preview  # Serve the built dist/ locally
 ```
 
-### 2. Open in Browser
-Navigate to `http://localhost:8080` in your web browser.
-
 ---
+
+## 📝 Adding Questions
+
+Add entries to the file for the grade that should get the question, `src/data/questions/grade1.json` … `grade6.json`. The grade comes from the file, so it is not written in each question.
+
+```json
+{ "id": 774, "prefId": 1, "prefName": "北海道", "category": "特産品・名物", "question": "…は どこ？", "explanation": "…だよ！" }
+```
+
+- `id` must be unique across all grades (use the next number after the largest one).
+- `prefId` is the answer prefecture's `id` from `src/data/prefectures.json`, and `prefName` is its name.
+- The answer is always a prefecture. Prefectures mentioned in the question text are never used as wrong choices.
+
+Run `npm test` afterwards. It checks required fields, unique `id`s, `prefId`/`prefName` consistency, at least 100 questions per grade, and the daily selection.
+Adding or removing questions changes the order of that grade's daily challenge, including today's set, so deploying around midnight JST is best.
 
 ## ⚙️ Analytics (Google tag)
 
@@ -72,7 +109,7 @@ The `GTM_ID` environment variable (`vars.GTM_ID` when deploying) takes precedenc
 
 ## 🚢 Deployment (GitHub Pages)
 
-Pushing to `main` runs GitHub Actions (`.github/workflows/deploy.yml`), which builds `dist/` with `npm run build` and publishes it to GitHub Pages.
+Pushing to `main` runs GitHub Actions (`.github/workflows/deploy.yml`), which runs `npm ci` and `npm test`, then builds `dist/` with `npm run build` and publishes it to GitHub Pages.
 It can also be run manually from the Actions tab. Set Settings → Pages → Source to "GitHub Actions".
 
 ---

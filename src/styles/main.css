@@ -66,6 +66,11 @@ body {
     position: relative;
 }
 
+/* Vue のマウント先。body の flex レイアウトがそのまま中身に効くようにする */
+#app {
+    display: contents;
+}
+
 /* 背景のチョークのらくがき */
 .background-decorations {
     position: fixed;
@@ -291,6 +296,308 @@ body {
     color: var(--chalk-dim);
     text-align: left;
     line-height: 1.6;
+}
+
+/* 今日のチャレンジ */
+.daily-panel {
+    width: 100%;
+    border: 3px solid var(--chalk-yellow);
+    border-radius: var(--hand-radius);
+    padding: 14px 16px 18px;
+    margin-bottom: 22px;
+    background: rgba(247, 224, 123, 0.05);
+    box-shadow: 0 0 14px rgba(247, 224, 123, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.daily-head {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.daily-title {
+    white-space: nowrap;
+    font-family: var(--font-hand);
+    font-size: 1.3rem;
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+}
+
+.daily-date {
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
+}
+
+.grade-select {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+.grade-btn {
+    background: rgba(0, 0, 0, 0.12);
+    border: 2px solid var(--chalk-faint);
+    color: var(--chalk-dim);
+    padding: 8px 0;
+    border-radius: var(--hand-radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+    .grade-btn:hover {
+        color: var(--chalk);
+        border-color: var(--chalk-dim);
+        transform: translateY(-2px) rotate(-1deg);
+    }
+}
+
+.grade-btn.active {
+    background: rgba(247, 224, 123, 0.1);
+    border: 3px solid var(--chalk-yellow);
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+}
+
+.daily-status {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
+}
+
+.daily-status.is-done {
+    color: var(--chalk-green);
+}
+
+.daily-start-btn {
+    font-size: 1.25rem;
+    padding: 10px 26px;
+    white-space: nowrap;
+}
+
+.free-play-title {
+    width: 100%;
+    font-family: var(--font-hand);
+    font-size: 1.2rem;
+    color: var(--chalk);
+    text-align: left;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+    border-bottom: 2px dashed var(--chalk-faint);
+}
+
+.daily-result {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+}
+
+/* スタンプカードへの入り口 (今日のチャレンジ・結果画面) */
+.stamp-link {
+    background: transparent;
+    border: none;
+    border-bottom: 2px dashed var(--chalk-faint);
+    color: var(--chalk-pink);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 2px 4px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+    .stamp-link:hover {
+        color: #FFD0DB;
+        border-bottom-color: var(--chalk-pink);
+    }
+}
+
+/* スタンプカード */
+.stamp-pressed-message {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+    margin: 10px 0 4px;
+}
+
+.stamp-card {
+    width: 100%;
+    border: 2px dashed var(--chalk-faint);
+    border-radius: var(--hand-radius);
+    padding: 14px 12px 16px;
+    margin: 14px 0 22px;
+}
+
+.stamp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.stamp-title {
+    white-space: nowrap;
+}
+
+.stamp-month {
+    white-space: nowrap;
+    font-family: var(--font-hand);
+    font-size: 1.25rem;
+    color: var(--chalk);
+    text-shadow: var(--chalk-glow);
+}
+
+.stamp-grade {
+    font-family: var(--font-family);
+    font-size: 0.75em;
+    color: var(--chalk-dim);
+    margin-left: 4px;
+}
+
+.stamp-nav {
+    background: transparent;
+    border: 2px solid var(--chalk-faint);
+    border-radius: var(--hand-radius-sm);
+    color: var(--chalk);
+    font-size: 1.3rem;
+    line-height: 1;
+    width: 40px;
+    height: 36px;
+    cursor: pointer;
+}
+
+.stamp-nav:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+.stamp-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.stamp-weekday {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
+    padding-bottom: 2px;
+}
+
+.stamp-weekday:first-child {
+    color: var(--chalk-pink);
+}
+
+.stamp-weekday:nth-child(7) {
+    color: var(--chalk-blue);
+}
+
+.stamp-day {
+    position: relative;
+    aspect-ratio: 1;
+    border: 1px dashed var(--chalk-faint);
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.stamp-num {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
+    padding: 2px 4px;
+    position: relative;
+    z-index: 1;
+}
+
+.stamp-day.is-today {
+    border: 2px solid var(--chalk-yellow);
+}
+
+.stamp-day.is-today .stamp-num {
+    color: var(--chalk-yellow);
+}
+
+.stamp-day.is-future {
+    opacity: 0.35;
+}
+
+.stamp-mark {
+    position: absolute;
+    inset: 6%;
+    width: 88%;
+    height: 88%;
+    transform: rotate(-8deg);
+}
+
+.stamp-mark circle {
+    fill: rgba(244, 166, 184, 0.14);
+    stroke: var(--chalk-pink);
+    stroke-width: 6;
+    stroke-dasharray: 18 4;
+}
+
+.stamp-mark path {
+    fill: var(--chalk-pink);
+    opacity: 0.9;
+}
+
+/* 押したばかりのスタンプは、上から「ポン」と押す */
+.stamp-day.is-pressed .stamp-mark {
+    animation: stampPress 0.6s cubic-bezier(0.3, 1.6, 0.6, 1) 0.3s both;
+}
+
+@keyframes stampPress {
+    0% { transform: scale(2.4) rotate(-30deg); opacity: 0; }
+    60% { opacity: 1; }
+    100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stamp-day.is-pressed .stamp-mark {
+        animation: none;
+    }
+}
+
+.stamp-summary {
+    margin-top: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--chalk);
+}
+
+.stamp-summary strong {
+    color: var(--chalk-pink);
+    font-size: 1.2em;
+}
+
+.stamp-rule {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--chalk-dim);
+    line-height: 1.5;
+}
+
+/* 1・2年生の選択肢のふりがな */
+.option-btn rt {
+    font-size: 0.55em;
+    color: var(--chalk-dim);
+    text-decoration: none;
 }
 
 /* モード選択タブ */
@@ -889,6 +1196,44 @@ body {
 
     .title-row {
         gap: 6px;
+    }
+
+    .grade-select {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stamp-title {
+        font-size: 1.6rem;
+    }
+
+    .stamp-month {
+        font-size: 1.05rem;
+    }
+
+    .stamp-card {
+        padding: 12px 8px 14px;
+    }
+
+    .stamp-grid {
+        gap: 4px;
+    }
+
+    .stamp-num {
+        font-size: 0.65rem;
+        padding: 1px 2px;
+    }
+
+    .daily-panel {
+        padding: 12px 12px 16px;
+    }
+
+    .daily-title {
+        font-size: 1.15rem;
+    }
+
+    .btn-primary.daily-start-btn {
+        font-size: 1.15rem;
+        padding: 10px 20px;
     }
 
     .title-sub {
