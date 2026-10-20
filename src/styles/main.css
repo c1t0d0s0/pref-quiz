@@ -1354,8 +1354,36 @@ body {
         gap: 6px;
     }
 
+    /* スマートフォン: スタート画面の すき間をつめて、縦に短くする */
+    .start-screen.card {
+        padding-top: 16px;
+        padding-bottom: 24px;
+    }
+
+    .start-screen .title-badge {
+        margin-bottom: 8px;
+    }
+
+    .start-screen .main-title {
+        margin-bottom: 12px;
+        line-height: 1.15;
+    }
+
+    .start-screen .title-row {
+        margin-top: 2px;
+    }
+
+    .start-screen .sparrow {
+        width: 3.2rem;
+    }
+
     .grade-select {
-        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+    }
+
+    .grade-btn {
+        padding: 6px 0;
+        font-size: 0.95rem;
     }
 
     .stamp-title {
@@ -1380,7 +1408,43 @@ body {
     }
 
     .daily-panel {
-        padding: 12px 12px 16px;
+        padding: 10px 12px 12px;
+        gap: 9px;
+        margin-bottom: 16px;
+    }
+
+    .free-play .free-play-title {
+        margin-bottom: 10px;
+    }
+
+    /* PC と同じく、見出しと同じ内容のものは出さない */
+    .free-play .mascot-box,
+    .free-play .mode-select-title {
+        display: none;
+    }
+
+    .free-play .mode-select-section {
+        margin-bottom: 8px;
+    }
+
+    .free-play .mode-btn {
+        padding: 6px 4px;
+        gap: 2px;
+    }
+
+    .free-play .rule-box {
+        gap: 0;
+        padding: 0 4px;
+        margin-bottom: 14px;
+    }
+
+    .free-play .rule-item {
+        font-size: 0.95rem;
+        padding: 3px 4px 4px;
+    }
+
+    .free-play .rule-icon {
+        font-size: 1.1rem;
     }
 
     .daily-title {
@@ -1431,5 +1495,45 @@ body {
 
     .score-num {
         font-size: 3.4rem;
+    }
+}
+
+/* とても せまいスマートフォン (幅 320px ほど): はみ出さないよう、文字と ボタンを少し小さくする */
+@media (max-width: 360px) {
+    .icon-btn {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+    }
+
+    .start-screen .main-title {
+        font-size: 1.5rem;
+        letter-spacing: 0;
+    }
+
+    .start-screen .title-sub {
+        font-size: 0.85rem;
+        letter-spacing: 0;
+    }
+
+    .daily-title {
+        font-size: 1.05rem;
+    }
+
+    .daily-head {
+        gap: 4px;
+    }
+
+    .daily-date {
+        font-size: 0.8rem;
+    }
+
+    .free-play .mode-name {
+        font-size: 0.8rem;
+    }
+
+    .btn-primary.pulse-btn {
+        font-size: 1.1rem;
+        padding: 10px 18px;
+        white-space: nowrap;
     }
 }
