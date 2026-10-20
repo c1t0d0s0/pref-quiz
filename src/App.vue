@@ -1,10 +1,13 @@
 <!-- 画面の切りかえ (スタート → クイズ → 結果、スタンプカード) と、学年・今日のチャレンジの記録 -->
 <script setup lang="ts">
-import { onBeforeUnmount, ref, useTemplateRef } from 'vue';
+import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
+import AccountBox from './components/AccountBox.vue';
 import StartScreen from './components/StartScreen.vue';
 import QuizScreen from './components/QuizScreen.vue';
 import ResultScreen from './components/ResultScreen.vue';
 import StampScreen from './components/StampScreen.vue';
+import { cloudAvailable, getSync, startCloud } from './cloud';
+import type { SyncStatus } from './cloud/sync';
 import { startConfetti } from './core/confetti';
 import { streakOf } from './core/daily';
 import { jstDate } from './core/date';
@@ -26,6 +29,8 @@ const dailyStreak = ref<number | null>(null);
 /** いま押したばかりのスタンプの日 (今日のチャレンジの結果からスタンプカードを開いたときだけ) */
 const pressedStamp = ref<string | null>(null);
 const soundOn = ref(sound.enabled);
+/** ログインと保存の状態 (Firebase の設定がないビルドでは使わない) */
+const cloudStatus = ref<SyncStatus>('loading');
 const confettiCanvas = useTemplateRef<HTMLCanvasElement>('confetti');
 let stopConfetti = () => {};
 
@@ -78,6 +83,24 @@ function toggleSound() {
   soundOn.value = sound.enabled;
 }
 
+// 最初の画面を出してから、ログインと Firestore の準備をする (Firebase の設定がないビルドでは何もしない)
+onMounted(() => {
+  void startCloud({
+    onStatus: () => {
+      cloudStatus.value = getSync()?.status ?? 'loading';
+    },
+    // ログイン・ログアウトや Firestore からの取りこみで、手元の記録が変わった
+    onData: () => {
+      grade.value = loadGrade();
+      record.value = loadDailyRecord();
+    },
+    askMigrate: () =>
+      confirm(
+        'この たんまつの きろくを アカウントに うつしますか？\n\n「OK」… うつす (アカウントの きろくと 合わせます)\n「キャンセル」… うつさない (たんまつの きろくは そのまま のこります)',
+      ),
+  });
+});
+
 onBeforeUnmount(() => stopConfetti());
 </script>
 
@@ -93,6 +116,7 @@ onBeforeUnmount(() => stopConfetti());
 
   <main class="app-container" :class="{ 'is-wide': screen === 'start' }">
     <header class="app-header">
+      <AccountBox v-if="cloudAvailable" :status="cloudStatus" />
       <button type="button" class="icon-btn" aria-label="効果音切り替え" @click="toggleSound">
         <span>{{ soundOn ? '🔊' : '🔇' }}</span> 効果音: <span>{{ soundOn ? 'ON' : 'OFF' }}</span>
       </button>

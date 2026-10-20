@@ -13,6 +13,7 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
   - Each grade has 100+ questions; no question repeats until the whole set has been used, and no prefecture is the answer twice on the same day.
   - Grades 1–2 use mostly hiragana and show furigana on the choices; upper grades mix in similar-shaped prefectures as wrong choices.
   - Cleared days and the current streak are saved in this browser (localStorage). Replays are allowed.
+- 🔑 **Optional Google Login**: Logged-in players' records are saved to Firestore and follow them across browsers and devices; without login, records stay in the browser.
 - 📒 **Stamp Card (スタンプカード)**: Finishing the daily challenge stamps that day on a per-grade monthly calendar, viewable up to a year back. Each day's stamp is a prefecture silhouette chosen by date.
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
@@ -43,11 +44,13 @@ pref-quiz/
 │   ├── types.ts                # Shared types (grade, prefecture, question, quiz)
 │   ├── components/             # StartScreen, DailyPanel, QuizScreen, QuestionCard, TimerBar,
 │   │                           # ResultScreen, ReviewList, StampScreen, StampCard, StampMark, SparrowIcon
+│   ├── cloud/                  # Google login and Firestore sync (only firebase.ts depends on Firebase)
 │   ├── core/                   # UI-independent logic (easy to unit test)
 │   │   ├── quiz.ts             # Building quizzes, 4-choice options, ranks
 │   │   ├── daily.ts            # Daily challenge selection (10 questions from date and grade)
 │   │   ├── stamps.ts           # Stamp card calendar and stamp pictures
 │   │   ├── storage.ts          # Saved grade and cleared days (localStorage)
+│   │   ├── snapshot.ts / merge.ts  # Firestore document shape and merge rules
 │   │   ├── date.ts / rng.ts    # JST dates, seeded random numbers
 │   │   ├── sound.ts            # Sound effects (Web Audio API)
 │   │   └── confetti.ts         # Confetti animation
@@ -60,7 +63,8 @@ pref-quiz/
 │   └── styles/main.css         # Styles (chalkboard design)
 ├── public/                     # Files served as-is (favicon.svg / favicon.ico / apple-touch-icon.png)
 ├── tests/                      # Vitest tests (data, daily selection, options, quiz screen)
-├── vite.config.ts              # Vite config and Google tag injection
+├── vite.config.ts              # Vite config, Google tag injection, Firebase settings
+├── firestore.rules / firebase.json  # Firestore rules and emulator config
 ├── config.example.js           # Example of config.js (config.js is git-ignored)
 └── .github/workflows/deploy.yml  # Deploys to GitHub Pages on push to main
 ```
@@ -95,6 +99,46 @@ Add entries to the file for the grade that should get the question, `src/data/qu
 
 Run `npm test` afterwards. It checks required fields, unique `id`s, `prefId`/`prefName` consistency, at least 100 questions per grade, and the daily selection.
 Adding or removing questions changes the order of that grade's daily challenge, including today's set, so deploying around midnight JST is best.
+
+## 🔑 Login and Saving (Firebase)
+
+Players who log in with Google have their records saved to Firebase Firestore, so they can play with the same records on any browser or device.
+Players who don't log in keep their records in that browser's localStorage only. The design is the same as social-studies-quiz.
+
+- The UI always reads and writes local records (`src/core/storage.ts`).
+  Logged-out records live under `pref-quiz:…` (the same place as before login existed); a logged-in player's copy lives under `pref-quiz:u:<uid>:…`.
+- While logged in, changes are batched and sent to Firestore (`src/cloud/sync.ts`). On login and on page load, the Firestore record and the local copy are merged and written to both (`src/core/merge.ts`).
+- On login, if the device has logged-out records, the player is asked whether to move them into the account. Logging out removes that player's copy from the device.
+- **Builds without Firebase settings show no login button and never load the Firebase code.**
+- Offline play keeps working on the local copy and is sent once back online. Logging out with unsent changes asks for confirmation.
+
+Merging is idempotent and order-independent, so playing on two devices or retrying after a failed request never loses or duplicates records:
+cleared days are unioned per grade (latest 400 days kept), and the grade setting takes whichever was changed last.
+
+Firestore uses the layout shared by the sibling learning apps, separated by `appId` (`pref-quiz` here):
+
+```
+users/{uid}                  Per-user info (no name, email or photo is stored)
+users/{uid}/apps/pref-quiz   Days the daily challenge was cleared (activeDays), cleared grade+day
+                             (completed: e.g. daily-g3-2026-10-20), settings (grade)
+```
+
+Set the values in `config.js` (locally) or as environment variables of the same names (GitHub Actions Variables); see `config.example.js`:
+`FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`, `FIREBASE_APP_ID`.
+In the Firebase console, enable Google sign-in under Authentication, add the site's domain to the authorized domains,
+and set the Firestore rules to `firestore.rules` (only the logged-in owner can read and write their records).
+If you share the project with social-studies-quiz, the rules are identical and already in place.
+
+When login fails, the Firebase error code is shown under the button (`auth/unauthorized-domain`, `auth/operation-not-allowed`, …); see the Japanese README for a table of fixes.
+
+### Running against the emulator (development)
+
+```sh
+npx firebase-tools emulators:start --only auth,firestore --project demo-pref-quiz
+FIREBASE_API_KEY=x FIREBASE_AUTH_DOMAIN=localhost FIREBASE_PROJECT_ID=demo-pref-quiz FIREBASE_APP_ID=x FIREBASE_EMULATOR=1 npm run dev
+```
+
+The emulator has no Google sign-in page: set `window.__testUser = 'test-user'` in the devtools console, then press 「Googleで ログイン」.
 
 ## ⚙️ Analytics (Google tag)
 

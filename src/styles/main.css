@@ -123,6 +123,53 @@ body {
     width: 100%;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* きろくの ほぞん (Google でログイン) */
+.account {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.account-status {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
+    white-space: nowrap;
+}
+
+.account-status.is-synced {
+    color: var(--chalk-green);
+}
+
+.account-status.is-offline {
+    color: var(--chalk-orange);
+}
+
+.icon-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.account-error {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    width: max-content;
+    max-width: 280px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--chalk-pink);
+    background: var(--board-dark);
+    border: 1px solid var(--chalk-pink);
+    border-radius: 6px;
+    padding: 4px 8px;
+    z-index: 3;
 }
 
 .icon-btn {
@@ -313,13 +360,28 @@ body {
         max-width: 1000px;
     }
 
-    /* 効果音ボタンは、黒板の右上におさめて1行ぶん縦を節約する */
+    /* 効果音ボタンは黒板の右上、ログインは左上におさめて、1行ぶん縦を節約する */
     .app-container.is-wide .app-header {
         position: absolute;
         top: 26px;
+        left: 30px;
         right: 30px;
         width: auto;
         z-index: 2;
+        pointer-events: none;
+    }
+
+    .app-container.is-wide .app-header > * {
+        pointer-events: auto;
+    }
+
+    .app-container.is-wide .account {
+        margin-right: auto;
+    }
+
+    .app-container.is-wide .account-error {
+        right: auto;
+        left: 0;
     }
 
     .start-screen {

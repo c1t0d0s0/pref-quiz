@@ -13,6 +13,7 @@
   - 学年ごとに100問以上のストックがあり、全部の問題が1回ずつ出るまで同じ問題は出ません。同じ日に同じ都道府県が答えの問題が重ならないようにならべています。
   - 1・2年生はひらがな中心の問題で、選択肢の都道府県名にふりがながつきます。高学年ほど形の似た都道府県が選択肢にまざり、むずかしくなります。
   - クリアした日と連続日数は、この端末（localStorage）に保存されます。何回でも挑戦できます。
+- 🔑 **Google でログイン（任意）**: ログインすると記録が Firestore に保存され、ほかのブラウザや端末でも同じ記録で遊べます。ログインしなくても、そのブラウザに保存して遊べます。
 - 📒 **スタンプカード**: 今日のチャレンジをさいごまでやると、その日にスタンプが押されます。学年ごとの月のカレンダーで、1年前までさかのぼって見られます。スタンプの絵は日によって変わる都道府県のシルエットです。
 - 🎮 **選べる3つのゲームモード**:
   - 🗺️ **シルエットクイズ**: 都道府県の形（影絵）を当てるモード
@@ -53,11 +54,13 @@ pref-quiz/
 │   │   ├── StampCard.vue       # スタンプカード（月のカレンダー）
 │   │   ├── StampMark.vue       # スタンプ1つ（都道府県のシルエット）
 │   │   └── SparrowIcon.vue     # スズメのキャラクター
+│   ├── cloud/                  # Google ログインと Firestore との同期（Firebase に依存するのは firebase.ts だけ）
 │   ├── core/                   # 画面に依存しない処理（テストしやすいように分けてある）
 │   │   ├── quiz.ts             # 問題の組み立て・4択の選択肢・称号
 │   │   ├── daily.ts            # 今日のチャレンジの出題（日付と学年から10問を決める）
 │   │   ├── stamps.ts           # スタンプカードのカレンダー・スタンプの絵
 │   │   ├── storage.ts          # 学年・クリアした日の保存（localStorage）
+│   │   ├── snapshot.ts / merge.ts  # Firestore に保存する形と、2 か所の記録の合わせ方
 │   │   ├── date.ts / rng.ts    # 日本時間の日付・種つき乱数
 │   │   ├── sound.ts            # 効果音（Web Audio API）
 │   │   └── confetti.ts         # 紙ふぶき
@@ -70,7 +73,8 @@ pref-quiz/
 │   └── styles/main.css         # スタイル（黒板デザイン）
 ├── public/                     # そのまま公開するファイル（favicon.svg / favicon.ico / apple-touch-icon.png）
 ├── tests/                      # Vitest のテスト（データ・出題・選択肢・クイズ画面）
-├── vite.config.ts              # Vite の設定・Google のタグの埋め込み
+├── vite.config.ts              # Vite の設定・Google のタグの埋め込み・Firebase の設定の読みこみ
+├── firestore.rules / firebase.json  # Firestore のルールとエミュレーターの設定
 ├── config.example.js           # config.js の見本（config.js は .gitignore 対象）
 └── .github/workflows/deploy.yml  # main への push で GitHub Pages に公開
 ```
@@ -114,6 +118,79 @@ npm run preview  # ビルドした dist/ を手元で確認
 
 追加したら `npm test` で、項目のぬけ・`id` の重複・都道府県の番号と名前・学年ごとの問題数（100問以上）・今日のチャレンジの出題を確かめられます。
 問題を追加・削除すると、その学年の今日のチャレンジの順番が変わります（その日の問題も変わるので、公開は日本時間の夜中がおすすめです）。
+
+## 🔑 ログインと記録の保存 (Firebase)
+
+Google でログインした人の記録は Firebase の Firestore に保存し、どのブラウザや端末でも同じ記録で遊べます。
+ログインしない人の記録は、そのブラウザの localStorage だけに保存します。しくみはスズメの社会クイズ (social-studies-quiz) と同じです。
+
+- 画面はいつも手元 (localStorage) の記録を読み書きする (`src/core/storage.ts`)。
+  ログインなしの記録は `pref-quiz:…` (ログイン機能を入れる前と同じ場所)、ログイン中の人の写しは `pref-quiz:u:<uid>:…`
+- ログイン中は、書きかわった分を少しまとめてから Firestore に送る (`src/cloud/sync.ts`)。
+  ログインしたとき・ページを開いたときは、Firestore の記録と手元の写しを合わせて、両方に書く (`src/core/merge.ts`)
+- ログインしたとき、その端末にログインなしの記録があれば、アカウントにうつすかどうかを聞く。ログアウトすると、その人の写しは端末から消す
+- **Firebase の設定を入れていないビルドでは、ログインの入り口は出ず、Firebase のコードも読みこまれません**
+- 通信できないときも手元の写しで遊べ、つながったときに送る。送れていない変更があるままログアウトしようとすると、たしかめる
+
+2 か所の記録の合わせ方は、何回合わせても同じ結果になるように決めてあります。2 台で別々に遊んでも、
+通信に失敗してやり直しても、記録が消えたり二重にふえたりしません。
+
+| 記録 | 合わせ方 |
+|---|---|
+| 今日のチャレンジをクリアした日 (学年ごと) | 両方を合わせた集合 (学年ごとに新しい 400 日分) |
+| えらんだ学年 | あとから変えたほう |
+
+Firestore の形は、小学生向けの学習アプリで共通にしてあり、記録はアプリごとの `appId` の下に分けて保存します。
+このアプリの `appId` は `pref-quiz` なので、ほかのアプリと同じ Firebase プロジェクトを使っても、記録はまざりません。
+
+```
+users/{uid}                  その人の情報 (名前・メールアドレス・写真は保存しない)
+users/{uid}/apps/pref-quiz   今日のチャレンジをクリアした日 (activeDays)、
+                             クリアした学年と日 (completed: daily-g3-2026-10-20 のような形)、設定 (settings: 学年)
+```
+
+設定値は `config.js` (手元) か、同じ名前の環境変数 (GitHub Actions では Variables) で入れます (`config.example.js` を参照)。
+4 つの値は Firebase コンソールの「ウェブアプリの設定」にあります。
+
+```js
+const FIREBASE_API_KEY = '…';
+const FIREBASE_AUTH_DOMAIN = '….firebaseapp.com';
+const FIREBASE_PROJECT_ID = '…';
+const FIREBASE_APP_ID = '…';
+```
+
+Firebase コンソールでは、Authentication で Google ログインを有効にし、承認済みドメインに公開先を足し、
+Firestore のルールに `firestore.rules` の内容を設定します (ログインしている本人だけが、自分の記録を読み書きできる)。
+スズメの社会クイズと同じプロジェクトを使う場合、ルールは同じ内容なので、そのままで動きます。
+
+### ログインできないとき
+
+ログインに失敗すると、ボタンの下に「ログインできませんでした (auth/…)」と、Firebase のエラーの名前が出ます。
+
+| エラーの名前 | 原因 | 直し方 |
+|---|---|---|
+| `auth/configuration-not-found` | そのプロジェクトで Authentication がまだ始まっていない | Firebase コンソール → Authentication →「始める」をおし、ログイン方法で Google を有効にする |
+| `auth/operation-not-allowed` | Google でのログインが有効になっていない | Authentication → ログイン方法 → Google を有効にして保存する |
+| `auth/unauthorized-domain` | 開いているサイトのドメインが登録されていない | Authentication → 設定 → 承認済みドメイン に、公開先のドメイン (手元なら `localhost`) を足す |
+| `auth/popup-blocked` | ブラウザがログインの画面 (ポップアップ) を止めた | ブラウザでこのサイトのポップアップをゆるす |
+| `auth/invalid-api-key` など | 設定値がまちがっている | 4 つの設定値を、コンソールの「ウェブアプリの設定」からコピーし直す |
+
+ログインはできるのに「まだ ほぞんできていません」のままのときは、Firestore Database がまだ作られていないか、
+ルールが `firestore.rules` の内容になっていません。
+
+13 歳未満の子どもの Google アカウントは、保護者の管理 (ファミリー リンク) が前提です。保護者のアカウントでログインして使うこともできます。
+
+### エミュレーターで動かす (開発用)
+
+本物の Firebase を使わずに、手元でログインと保存をためせます (Java が必要)。
+
+```sh
+npx firebase-tools emulators:start --only auth,firestore --project demo-pref-quiz
+FIREBASE_API_KEY=x FIREBASE_AUTH_DOMAIN=localhost FIREBASE_PROJECT_ID=demo-pref-quiz FIREBASE_APP_ID=x FIREBASE_EMULATOR=1 npm run dev
+```
+
+エミュレーターには Google のログイン画面がないので、ブラウザの開発者ツールで `window.__testUser = 'test-user'` としてから
+「Googleで ログイン」をおすと、その名前のユーザーとしてログインします。
 
 ## ⚙️ アクセス解析 (Google のタグ)
 
