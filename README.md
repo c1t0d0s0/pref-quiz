@@ -17,10 +17,10 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 - 📒 **Stamp Card (スタンプカード)**: Finishing the daily challenge stamps that day on a per-grade monthly calendar, viewable up to a year back. Each day's stamp is a prefecture silhouette chosen by date.
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
-  - 💡 **Knowledge Quiz (ちしき)**: 770+ trivia questions covering geography, landmarks, specialties, population, and records.
+  - 💡 **Knowledge Quiz (ちしき)**: 760+ trivia questions covering geography, landmarks, specialties, population, and records.
   - 🌟 **Mix Quiz (ミックス)**: A fun 10-question random combination of silhouette and knowledge questions.
 - 🗺️ **47 Japanese Prefecture SVG Silhouettes**: High-resolution, smooth SVG vector shapes for all 47 prefectures in Japan.
-- 📚 **Per-Grade Question Data**: 773 knowledge questions kept in one JSON file per school grade (`src/data/questions/grade1.json` … `grade6.json`).
+- 📚 **Per-Grade Question Data**: 768 knowledge questions kept in one JSON file per school grade (`src/data/questions/grade1.json` … `grade6.json`).
 - 🎯 **10-Question Random Quiz**: Each session presents 10 questions with a 30-second countdown timer.
 - 🧠 **Smart Shape-Similarity Algorithm**: Distractor options are intelligently picked based on shape similarity to provide a fun and challenging experience.
 - 🎨 **Chalkboard Design**: A wooden-framed chalkboard look with handwritten fonts ([Klee One](https://fonts.google.com/specimen/Klee+One), [Yomogi](https://fonts.google.com/specimen/Yomogi)) and a sparrow mascot.
@@ -90,7 +90,7 @@ npm run preview  # Serve the built dist/ locally
 Add entries to the file for the grade that should get the question, `src/data/questions/grade1.json` … `grade6.json`. The grade comes from the file, so it is not written in each question.
 
 ```json
-{ "id": 774, "prefId": 1, "prefName": "北海道", "category": "特産品・名物", "question": "…は どこ？", "explanation": "…だよ！" }
+{ "id": 845, "prefId": 1, "prefName": "北海道", "category": "特産品・名物", "question": "…は どこ？", "explanation": "…だよ！" }
 ```
 
 - `id` must be unique across all grades (use the next number after the largest one).
