@@ -1,32 +1,44 @@
 /* ==========================================================================
    都道府県シルエット＆ちしきクイズ - Style Sheet
-   明るくポップで親しみやすい小学生向けデザイン
+   木わくの黒板にチョークで書いたような、教室の雰囲気のデザイン
    ========================================================================== */
 
 :root {
-    --bg-gradient: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
-    --card-bg: #FFFFFF;
-    --primary-color: #FF5964;
-    --primary-hover: #E03E49;
-    --secondary-color: #35A7FF;
-    --secondary-hover: #1F8CE0;
-    --accent-yellow: #FFE600;
-    --accent-green: #38B000;
-    --accent-purple: #9D4EDD;
-    
-    --text-main: #2B2D42;
-    --text-muted: #5C677D;
-    
-    --font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, sans-serif;
-    
-    --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.08);
-    --shadow-pop: 0 8px 0px rgba(0, 0, 0, 0.15);
-    --shadow-btn: 0 6px 0px #C93B45;
-    --shadow-btn-sec: 0 6px 0px #1E79C4;
+    /* 黒板 */
+    --board: #2F4A3A;
+    --board-dark: #243A2D;
+    --board-light: #3A5A47;
 
-    --border-radius-lg: 28px;
-    --border-radius-md: 18px;
-    --border-radius-sm: 12px;
+    /* 木わく */
+    --wood: #8B5A2B;
+    --wood-dark: #5E3A1A;
+    --wood-light: #B07A45;
+
+    /* チョーク */
+    --chalk: #F4F1E8;
+    --chalk-dim: rgba(244, 241, 232, 0.7);
+    --chalk-faint: rgba(244, 241, 232, 0.35);
+    --chalk-yellow: #F7E07B;
+    --chalk-pink: #F4A6B8;
+    --chalk-blue: #9FD3F0;
+    --chalk-green: #A8E6A1;
+    --chalk-orange: #F6B97A;
+
+    --text-main: var(--chalk);
+    --text-muted: var(--chalk-dim);
+
+    --font-family: 'Klee One', 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-hand: 'Yomogi', 'Klee One', sans-serif;
+
+    /* チョークのにじみ */
+    --chalk-glow: 0 0 1px rgba(244, 241, 232, 0.6), 0 0 6px rgba(244, 241, 232, 0.15);
+
+    /* 手書きっぽいゆがんだ角 */
+    --hand-radius: 14px 18px 12px 20px / 18px 12px 20px 14px;
+    --hand-radius-sm: 10px 14px 9px 13px / 13px 9px 14px 10px;
+
+    /* チョークの粉のノイズ */
+    --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 * {
@@ -40,7 +52,10 @@
 
 body {
     min-height: 100vh;
-    background: var(--bg-gradient);
+    background-color: #1E2A23;
+    background-image:
+        var(--noise),
+        radial-gradient(ellipse at 50% 0%, #2C3D33 0%, #1A241E 70%, #141B17 100%);
     color: var(--text-main);
     display: flex;
     flex-direction: column;
@@ -51,7 +66,7 @@ body {
     position: relative;
 }
 
-/* 浮遊する背景オブジェクト */
+/* 背景のチョークのらくがき */
 .background-decorations {
     position: fixed;
     top: 0;
@@ -66,26 +81,29 @@ body {
 .floating-shape {
     position: absolute;
     font-size: 2.2rem;
-    opacity: 0.25;
-    animation: floatAnim 12s infinite ease-in-out;
+    font-family: var(--font-hand);
+    color: var(--chalk);
+    opacity: 0.12;
+    filter: grayscale(1) brightness(2.2);
+    animation: floatAnim 14s infinite ease-in-out;
 }
 
 .shape-1 { top: 10%; left: 8%; animation-delay: 0s; }
 .shape-2 { top: 75%; left: 12%; animation-delay: 2s; }
 .shape-3 { top: 15%; right: 10%; animation-delay: 4s; }
-.shape-4 { top: 80%; right: 15%; animation-delay: 1s; font-size: 1.5rem; font-weight: bold; }
+.shape-4 { top: 80%; right: 15%; animation-delay: 1s; font-size: 1.6rem; }
 .shape-5 { top: 50%; left: 5%; animation-delay: 3s; }
 .shape-6 { top: 45%; right: 6%; animation-delay: 5s; }
 
 @keyframes floatAnim {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(10deg); }
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-14px) rotate(6deg); }
 }
 
 /* メインコンテナ */
 .app-container {
     width: 100%;
-    max-width: 620px;
+    max-width: 640px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -103,36 +121,71 @@ body {
 }
 
 .icon-btn {
-    background: #FFFFFF;
-    border: 3px solid #35A7FF;
-    color: #1F8CE0;
-    padding: 8px 16px;
-    border-radius: 50px;
+    background: transparent;
+    border: 2px dashed var(--chalk-faint);
+    color: var(--chalk-dim);
+    padding: 6px 16px;
+    border-radius: var(--hand-radius-sm);
     font-size: 0.95rem;
-    font-weight: 800;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s, background-color 0.2s;
+    transition: color 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .icon-btn:hover {
-    transform: scale(1.05);
-    background: #EBF7FF;
+    color: var(--chalk);
+    border-color: var(--chalk-dim);
+    transform: rotate(-1deg);
 }
 
-/* カード基底スタイル */
+/* カード基底スタイル = 木わくの黒板 */
 .card {
-    background: var(--card-bg);
+    background-color: var(--board);
+    background-image:
+        var(--noise),
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 85%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+        linear-gradient(160deg, var(--board-light) 0%, var(--board) 45%, var(--board-dark) 100%);
     width: 100%;
-    border-radius: var(--border-radius-lg);
-    padding: 28px 24px;
-    box-shadow: var(--shadow-soft);
-    border: 4px solid #FFFFFF;
+    border-radius: 6px;
+    padding: 30px 26px 40px;
+    border: 14px solid var(--wood);
+    border-image: linear-gradient(135deg, var(--wood-light), var(--wood) 30%, var(--wood-dark) 60%, var(--wood) 85%, var(--wood-light)) 1;
+    box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.45),
+        0 14px 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     position: relative;
+}
+
+/* チョーク置き（下の木のトレイ） */
+.card::after {
+    content: '';
+    position: absolute;
+    left: -14px;
+    right: -14px;
+    bottom: -26px;
+    height: 12px;
+    background: linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.45);
+}
+
+/* トレイにのったチョーク */
+.card::before {
+    content: '';
+    position: absolute;
+    right: 40px;
+    bottom: -20px;
+    width: 46px;
+    height: 7px;
+    border-radius: 3px;
+    background: var(--chalk);
+    box-shadow: -62px 0 0 var(--chalk-yellow), -124px 0 0 var(--chalk-pink);
+    z-index: 2;
 }
 
 /* 画面切り替え表示 */
@@ -147,64 +200,97 @@ body {
     display: flex;
     opacity: 1;
     transform: translateY(0);
+    margin-bottom: 26px;
 }
 
 /* --------------------------------------------------------------------------
    1. スタート画面 ＆ モード選択
    -------------------------------------------------------------------------- */
 .title-badge {
-    background: var(--accent-purple);
-    color: #FFFFFF;
-    font-weight: 800;
-    font-size: 0.9rem;
-    padding: 6px 18px;
-    border-radius: 50px;
-    margin-bottom: 12px;
-    letter-spacing: 1px;
+    color: var(--chalk-yellow);
+    font-family: var(--font-hand);
+    font-size: 1rem;
+    padding: 2px 18px;
+    border-top: 2px solid var(--chalk-yellow);
+    border-bottom: 2px solid var(--chalk-yellow);
+    margin-bottom: 14px;
+    letter-spacing: 4px;
+    text-shadow: var(--chalk-glow);
+    opacity: 0.9;
 }
 
 .main-title {
-    font-size: 2.1rem;
-    font-weight: 900;
-    color: #FF3366;
-    line-height: 1.25;
-    text-shadow: 2px 2px 0px #FFE600;
+    font-family: var(--font-hand);
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: var(--chalk);
+    line-height: 1.3;
+    letter-spacing: 2px;
+    text-shadow: var(--chalk-glow);
     margin-bottom: 20px;
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 6px;
+    white-space: nowrap;
+}
+
+/* スズメのキャラクター */
+.sparrow {
+    flex: none;
+    width: clamp(3.6rem, 16vw, 5.2rem);
+    transform: rotate(6deg);
+    animation: sparrowHop 3s infinite ease-in-out;
+}
+
+.sparrow svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 3px rgba(244, 241, 232, 0.35));
+}
+
+@keyframes sparrowHop {
+    0%, 70%, 100% { transform: translateY(0) rotate(6deg); }
+    80% { transform: translateY(-8px) rotate(2deg); }
+    90% { transform: translateY(0) rotate(6deg); }
 }
 
 .title-sub {
     font-size: 1.05rem;
-    color: #35A7FF;
-    text-shadow: none;
+    color: var(--chalk-blue);
+    letter-spacing: 1px;
     display: inline-block;
-    background: #EBF7FF;
-    padding: 4px 14px;
-    border-radius: 20px;
+    padding: 0 6px 2px;
+    background: linear-gradient(transparent 82%, rgba(159, 211, 240, 0.45) 82%, rgba(159, 211, 240, 0.45) 92%, transparent 92%);
 }
 
 .mascot-box {
-    background: #FFF9DB;
-    border: 3px dashed #FFE600;
-    border-radius: var(--border-radius-md);
-    padding: 16px;
+    border: 2px dashed var(--chalk-faint);
+    border-radius: var(--hand-radius);
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .mascot-img {
-    font-size: 2.8rem;
+    font-size: 2.6rem;
     flex-shrink: 0;
 }
 
 .mascot-bubble {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #4A4E69;
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
     text-align: left;
-    line-height: 1.4;
+    line-height: 1.6;
 }
 
 /* モード選択タブ */
@@ -214,28 +300,28 @@ body {
 }
 
 .mode-select-title {
-    font-size: 1rem;
-    font-weight: 800;
-    color: var(--text-main);
+    font-family: var(--font-hand);
+    font-size: 1.1rem;
+    color: var(--chalk);
     margin-bottom: 10px;
     text-align: left;
 }
 
 .mode-select-container {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
 }
 
 .mode-btn {
     flex: 1;
-    background: #F1F5F9;
-    border: 3px solid #CBD5E1;
-    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.12);
+    border: 2px solid var(--chalk-faint);
+    color: var(--chalk-dim);
     padding: 10px 4px;
-    border-radius: var(--border-radius-md);
+    border-radius: var(--hand-radius);
     font-size: 0.9rem;
-    font-weight: 800;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -246,16 +332,18 @@ body {
 
 @media (hover: hover) {
     .mode-btn:hover {
-        background: #E2E8F0;
-        transform: translateY(-2px);
+        color: var(--chalk);
+        border-color: var(--chalk-dim);
+        transform: translateY(-2px) rotate(-0.5deg);
     }
 }
 
 .mode-btn.active {
-    background: #FFE600;
-    border-color: #FFC700;
-    color: #2B2D42;
-    box-shadow: 0 4px 0px #E5B200;
+    background: rgba(247, 224, 123, 0.1);
+    border: 3px solid var(--chalk-yellow);
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+    box-shadow: 0 0 12px rgba(247, 224, 123, 0.18);
     transform: translateY(-2px);
 }
 
@@ -264,18 +352,17 @@ body {
 }
 
 .mode-name {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
 }
 
 .rule-box {
-    background: #F8F9FA;
-    border-radius: var(--border-radius-md);
     width: 100%;
-    padding: 16px;
+    padding: 6px 4px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 24px;
+    gap: 6px;
+    margin-bottom: 26px;
+    text-align: left;
 }
 
 .rule-item {
@@ -283,12 +370,19 @@ body {
     align-items: center;
     gap: 12px;
     font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--text-main);
+    font-weight: 600;
+    color: var(--chalk);
+    padding: 4px 4px 6px;
+    border-bottom: 1px dashed var(--chalk-faint);
+}
+
+.rule-item strong {
+    color: var(--chalk-yellow);
+    font-size: 1.15em;
 }
 
 .rule-icon {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
 }
 
 /* ボタン共通 */
@@ -296,18 +390,21 @@ body {
     border: none;
     outline: none;
     cursor: pointer;
-    font-weight: 900;
-    border-radius: 50px;
-    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    font-weight: 700;
+    border-radius: var(--hand-radius);
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary {
-    background: var(--primary-color);
-    color: #FFFFFF;
-    font-size: 1.4rem;
-    padding: 16px 40px;
-    box-shadow: var(--shadow-btn);
+    background: rgba(244, 166, 184, 0.08);
+    color: var(--chalk-pink);
+    border: 3px solid var(--chalk-pink);
+    font-family: var(--font-hand);
+    font-size: 1.45rem;
+    padding: 12px 38px;
+    text-shadow: var(--chalk-glow);
+    box-shadow: 0 0 14px rgba(244, 166, 184, 0.15);
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -315,18 +412,19 @@ body {
 
 @media (hover: hover) {
     .btn-primary:hover {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
+        background: rgba(244, 166, 184, 0.16);
+        color: #FFD0DB;
+        border-color: #FFD0DB;
+        transform: translateY(-2px) rotate(-1deg);
     }
 }
 
 .btn-primary:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0px #C93B45;
+    transform: translateY(2px) scale(0.98);
 }
 
 .pulse-btn {
-    animation: pulseGlow 2s infinite ease-in-out;
+    animation: pulseGlow 2.4s infinite ease-in-out;
 }
 
 @keyframes pulseGlow {
@@ -342,35 +440,24 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 14px;
 }
 
-.progress-badge {
-    background: #E0F2FE;
-    color: #0284C7;
-    font-weight: 900;
-    padding: 6px 14px;
-    border-radius: 50px;
-    font-size: 0.95rem;
-}
-
-.mode-type-badge {
-    background: #F3E8FF;
-    color: #7E22CE;
-    font-weight: 900;
-    padding: 6px 14px;
-    border-radius: 50px;
-    font-size: 0.95rem;
-}
-
+.progress-badge,
+.mode-type-badge,
 .score-badge {
-    background: #FEF3C7;
-    color: #D97706;
-    font-weight: 900;
-    padding: 6px 14px;
-    border-radius: 50px;
+    font-weight: 600;
+    padding: 2px 12px;
     font-size: 0.95rem;
+    border-radius: var(--hand-radius-sm);
+    border: 2px solid currentColor;
+    text-shadow: var(--chalk-glow);
 }
+
+.progress-badge { color: var(--chalk-blue); }
+.mode-type-badge { color: var(--chalk-dim); border-style: dashed; }
+.score-badge { color: var(--chalk-yellow); }
 
 /* タイマーバー */
 .timer-container {
@@ -381,26 +468,30 @@ body {
 .timer-label {
     display: flex;
     justify-content: space-between;
-    font-weight: 800;
+    font-weight: 600;
     font-size: 0.95rem;
-    color: var(--text-muted);
+    color: var(--chalk-dim);
     margin-bottom: 6px;
 }
 
 .timer-bar-outer {
     width: 100%;
     height: 16px;
-    background: #E2E8F0;
-    border-radius: 50px;
+    background: transparent;
+    border: 2px solid var(--chalk-faint);
+    border-radius: 8px 10px 7px 9px;
     overflow: hidden;
-    padding: 3px;
+    padding: 2px;
 }
 
 .timer-bar-inner {
     height: 100%;
     width: 100%;
-    background: linear-gradient(90deg, #38B000 0%, #FFE600 70%, #FF5964 100%);
-    border-radius: 50px;
+    background:
+        repeating-linear-gradient(-55deg, rgba(255, 255, 255, 0.25) 0 3px, transparent 3px 7px),
+        linear-gradient(90deg, var(--chalk-green) 0%, var(--chalk-yellow) 70%, var(--chalk-pink) 100%);
+    opacity: 0.85;
+    border-radius: 5px;
     transition: width 0.1s linear;
 }
 
@@ -409,8 +500,8 @@ body {
 }
 
 @keyframes blinkTimer {
-    from { opacity: 1; }
-    to { opacity: 0.5; }
+    from { opacity: 0.9; }
+    to { opacity: 0.4; }
 }
 
 /* 問題ボックス */
@@ -421,16 +512,14 @@ body {
 
 /* 1. シルエットカード */
 .silhouette-card {
-    background: radial-gradient(circle, #F8FAFC 0%, #E2E8F0 100%);
-    border: 4px solid #CBD5E1;
-    border-radius: var(--border-radius-md);
+    border: 2px dashed var(--chalk-faint);
+    border-radius: var(--hand-radius);
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .silhouette-svg-wrapper {
@@ -445,64 +534,68 @@ body {
 .silhouette-svg-wrapper svg {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(4px 6px 8px rgba(0, 0, 0, 0.25));
+    overflow: visible;
+    filter: drop-shadow(0 0 4px rgba(244, 241, 232, 0.25));
     transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 .silhouette-svg-wrapper path {
-    fill: #1E293B;
+    fill: rgba(244, 241, 232, 0.82);
+    stroke: var(--chalk);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
     fill-rule: evenodd;
-    transition: fill 0.4s ease;
+    transition: fill 0.4s ease, stroke 0.4s ease;
 }
 
 .silhouette-svg-wrapper.revealed path {
-    fill: #FF5964;
+    fill: rgba(244, 166, 184, 0.85);
+    stroke: var(--chalk-pink);
     fill-rule: evenodd;
 }
 
 /* 2. 知識クイズカード */
 .knowledge-card {
-    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-    border: 4px solid #7DD3FC;
-    border-radius: var(--border-radius-md);
+    border: 2px dashed var(--chalk-faint);
+    border-radius: var(--hand-radius);
     padding: 24px 20px;
     min-height: 230px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03);
+    gap: 14px;
     position: relative;
 }
 
 .knowledge-category {
-    background: #0284C7;
-    color: #FFFFFF;
-    font-size: 0.85rem;
-    font-weight: 800;
-    padding: 4px 16px;
-    border-radius: 50px;
-    letter-spacing: 0.5px;
+    color: var(--chalk-blue);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0 12px 2px;
+    border-bottom: 2px solid var(--chalk-blue);
+    letter-spacing: 1px;
+    text-shadow: var(--chalk-glow);
 }
 
 .knowledge-text {
-    font-size: 1.35rem;
-    font-weight: 900;
-    line-height: 1.5;
-    color: var(--text-main);
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--chalk);
+    text-shadow: var(--chalk-glow);
     word-break: break-word;
 }
 
 .knowledge-explanation {
-    background: #FFFFFF;
-    border: 2px solid #38BDF8;
-    color: #0369A1;
-    font-size: 0.9rem;
-    font-weight: 800;
+    background: rgba(247, 224, 123, 0.08);
+    border: 2px solid var(--chalk-yellow);
+    color: var(--chalk-yellow);
+    font-size: 0.95rem;
+    font-weight: 600;
     padding: 8px 14px;
-    border-radius: var(--border-radius-sm);
-    line-height: 1.4;
+    border-radius: var(--hand-radius-sm);
+    line-height: 1.5;
     animation: fadeInExp 0.3s ease;
 }
 
@@ -520,51 +613,64 @@ body {
 }
 
 .option-btn {
-    background: #FFFFFF;
-    border: 3px solid #E2E8F0;
-    color: var(--text-main);
-    font-size: 1.25rem;
-    font-weight: 800;
-    padding: 16px 12px;
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 6px 0px #CBD5E1;
+    background: rgba(0, 0, 0, 0.12);
+    border: 2px solid var(--chalk-dim);
+    color: var(--chalk);
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 14px 12px;
+    text-shadow: var(--chalk-glow);
     cursor: pointer;
     position: relative;
     word-break: break-all;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.1s ease, border-color 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.1s ease, border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
     outline: none;
 }
 
+.option-btn:nth-child(2n) { border-radius: 18px 12px 20px 14px / 12px 20px 14px 18px; }
+
 @media (hover: hover) {
     .option-btn:hover:not(:disabled) {
-        border-color: #35A7FF;
-        background: #F0F9FF;
-        transform: translateY(-2px);
+        border-color: var(--chalk-blue);
+        color: var(--chalk-blue);
+        background: rgba(159, 211, 240, 0.08);
+        transform: translateY(-2px) rotate(-0.5deg);
     }
 }
 
 .option-btn:active:not(:disabled) {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0px #CBD5E1;
+    transform: translateY(2px) scale(0.98);
 }
 
 .option-btn.correct {
-    background: #DCFCE7 !important;
-    border-color: #22C55E !important;
-    color: #15803D !important;
-    box-shadow: 0 6px 0px #86EFAC !important;
+    background: rgba(168, 230, 161, 0.14) !important;
+    border: 3px solid var(--chalk-green) !important;
+    color: var(--chalk-green) !important;
     animation: correctBounce 0.4s ease;
 }
 
+/* 正解に丸をつける */
+.option-btn.correct::after {
+    content: '';
+    position: absolute;
+    inset: -6px -4px;
+    border: 3px solid var(--chalk-pink);
+    border-radius: 50% 46% 52% 48% / 52% 50% 48% 50%;
+    transform: rotate(-3deg);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
 .option-btn.wrong {
-    background: #FEE2E2 !important;
-    border-color: #EF4444 !important;
-    color: #B91C1C !important;
-    box-shadow: 0 6px 0px #FCA5A5 !important;
+    background: rgba(244, 166, 184, 0.1) !important;
+    border: 3px solid var(--chalk-pink) !important;
+    color: var(--chalk-pink) !important;
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
     animation: wrongShake 0.4s ease;
 }
 
@@ -574,7 +680,7 @@ body {
 
 @keyframes correctBounce {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
+    50% { transform: scale(1.06); }
 }
 
 @keyframes wrongShake {
@@ -591,62 +697,67 @@ body {
 }
 
 .result-emoji {
-    font-size: 3.5rem;
-    margin-bottom: 8px;
+    font-size: 3.2rem;
+    margin-bottom: 6px;
 }
 
 .result-title {
-    font-size: 2rem;
-    font-weight: 900;
-    color: var(--text-main);
+    font-family: var(--font-hand);
+    font-size: 2.1rem;
+    font-weight: 400;
+    color: var(--chalk);
+    letter-spacing: 2px;
+    text-shadow: var(--chalk-glow);
 }
 
 .score-card {
-    background: #FFF9DB;
-    border: 3px solid #FFE600;
-    border-radius: var(--border-radius-md);
+    border: 2px dashed var(--chalk-faint);
+    border-radius: var(--hand-radius);
     width: 100%;
     padding: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .score-main {
     display: flex;
     align-items: baseline;
-    gap: 4px;
+    gap: 6px;
 }
 
 .score-num {
-    font-size: 3.8rem;
-    font-weight: 900;
-    color: #FF3366;
+    font-family: var(--font-hand);
+    font-size: 4.2rem;
+    color: var(--chalk-yellow);
     line-height: 1;
+    text-shadow: var(--chalk-glow), 0 0 14px rgba(247, 224, 123, 0.3);
 }
 
 .score-unit {
     font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--text-muted);
+    font-weight: 600;
+    color: var(--chalk-dim);
 }
 
+/* はんこ風のランク */
 .rank-badge {
-    background: #FF5964;
-    color: #FFFFFF;
-    font-size: 1.15rem;
-    font-weight: 900;
-    padding: 6px 20px;
-    border-radius: 50px;
-    box-shadow: 0 4px 10px rgba(255, 89, 100, 0.3);
+    color: var(--chalk-pink);
+    border: 3px double var(--chalk-pink);
+    font-family: var(--font-hand);
+    font-size: 1.2rem;
+    padding: 4px 20px;
+    border-radius: var(--hand-radius-sm);
+    transform: rotate(-3deg);
+    text-shadow: var(--chalk-glow);
 }
 
 .result-message {
     font-size: 1.05rem;
-    font-weight: 800;
-    color: #4A4E69;
+    font-weight: 600;
+    color: var(--chalk);
 }
 
 /* 振り返りリスト */
@@ -657,17 +768,18 @@ body {
 }
 
 .review-title {
-    font-size: 1.1rem;
-    font-weight: 900;
+    font-family: var(--font-hand);
+    font-size: 1.15rem;
+    font-weight: 400;
     margin-bottom: 12px;
-    color: var(--text-main);
+    color: var(--chalk);
 }
 
 .review-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: 240px;
+    max-height: 260px;
     overflow-y: auto;
     padding-right: 6px;
 }
@@ -676,30 +788,37 @@ body {
     width: 6px;
 }
 .review-list::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: var(--chalk-faint);
     border-radius: 10px;
 }
 
 .review-item {
-    background: #F8FAFC;
-    border: 2px solid #E2E8F0;
-    border-radius: var(--border-radius-sm);
-    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.12);
+    border-left: 4px solid var(--chalk-faint);
+    border-radius: 4px;
+    padding: 10px 14px;
     display: flex;
     flex-direction: column;
     gap: 4px;
     font-size: 0.95rem;
-    font-weight: 800;
+    font-weight: 600;
+    color: var(--chalk);
+}
+
+.review-item strong {
+    color: var(--chalk-yellow);
 }
 
 .review-item.is-correct {
-    border-color: #86EFAC;
-    background: #F0FDF4;
+    border-left-color: var(--chalk-green);
 }
 
 .review-item.is-wrong {
-    border-color: #FCA5A5;
-    background: #FEF2F2;
+    border-left-color: var(--chalk-pink);
+}
+
+.review-mistake {
+    color: var(--chalk-pink);
 }
 
 .review-item-header {
@@ -719,9 +838,9 @@ body {
 }
 
 .review-explanation-text {
-    font-size: 0.82rem;
-    color: #475569;
-    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--chalk-dim);
+    font-weight: 600;
     margin-top: 2px;
 }
 
@@ -737,8 +856,8 @@ body {
 
 .app-footer {
     font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-muted);
+    font-weight: 600;
+    color: rgba(244, 241, 232, 0.45);
     margin-top: 16px;
     text-align: center;
 }
@@ -747,18 +866,38 @@ body {
     body {
         padding: 10px;
     }
-    
+
     .card {
-        padding: 20px 16px;
-        border-radius: 22px;
+        padding: 22px 14px 32px;
+        border-width: 10px;
     }
-    
+
+    .card::after {
+        left: -10px;
+        right: -10px;
+        bottom: -22px;
+    }
+
+    .card::before {
+        bottom: -16px;
+    }
+
     .main-title {
         font-size: 1.75rem;
+        letter-spacing: 1px;
     }
-    
+
+    .title-row {
+        gap: 6px;
+    }
+
     .title-sub {
         font-size: 0.95rem;
+    }
+
+    .quiz-info-bar {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     .silhouette-svg-wrapper {
@@ -771,25 +910,25 @@ body {
     }
 
     .knowledge-text {
-        font-size: 1.15rem;
+        font-size: 1.2rem;
     }
 
     .options-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 12px;
     }
-    
+
     .option-btn {
-        font-size: 1.15rem;
-        padding: 14px 10px;
+        font-size: 1.2rem;
+        padding: 12px 10px;
     }
 
     .btn-primary {
-        font-size: 1.2rem;
-        padding: 14px 30px;
+        font-size: 1.25rem;
+        padding: 12px 28px;
     }
 
     .score-num {
-        font-size: 3rem;
+        font-size: 3.4rem;
     }
 }

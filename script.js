@@ -1049,8 +1049,8 @@ class QuizApp {
             }
 
             const userPickText = ans.isTimeout 
-                ? ' <span style="color:#EF4444;">(じかんぎれ)</span>' 
-                : (ans.isCorrect ? '' : ` <span style="color:#EF4444;">[きみの解答: ${ans.selected ? ans.selected.name : ''}]</span>`);
+                ? ' <span class="review-mistake">(じかんぎれ)</span>' 
+                : (ans.isCorrect ? '' : ` <span class="review-mistake">[きみの解答: ${ans.selected ? ans.selected.name : ''}]</span>`);
 
             item.innerHTML = `
                 <div class="review-item-header">
@@ -1083,7 +1083,7 @@ function startConfetti() {
     });
 
     const particles = [];
-    const colors = ['#FF5964', '#35A7FF', '#FFE600', '#38B000', '#9D4EDD', '#FF924C'];
+    const colors = ['#F4F1E8', '#F4A6B8', '#9FD3F0', '#F7E07B', '#A8E6A1', '#F6B97A'];
 
     for (let i = 0; i < 90; i++) {
         particles.push({

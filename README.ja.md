@@ -19,7 +19,7 @@
 - 🎨 **小学生向けポップデザイン**: 明るいパステルカラー、丸みのあるボタン、可愛いフォント（[M PLUS Rounded 1c](https://fonts.google.com/specimen/M+PLUS+Rounded+1c)）を採用。
 - 🎵 **Web Audio API 効果音**: 外部音声ファイル不要の軽量サウンドエンジン（正解ピンポン♪、不正解ブブー、カウントダウン、ファンファーレ）を搭載（ミュート切り替え付き）。
 - 🎊 **紙吹雪（Confetti）演出**: 高得点（80点以上）達成時に画面全体に華やかなカラー紙吹雪が舞うアニメーション。
-- 📊 **Google Tag Manager 連携**: `config.js` から測定IDを動的に読み込みトラッキングタグを発行。
+- 📊 **Google のタグ連携**: ビルド時に `GTM_ID`（環境変数 または `config.js`）があれば、Google アナリティクス / タグ マネージャーのタグを埋め込み。
 - 📱 **完全レスポンシブ対応**: スマートフォン、タブレット、PCのどの画面サイズでもきれいに表示・操作可能。
 
 ---
@@ -28,12 +28,16 @@
 
 ```text
 pref-quiz/
-├── index.html        # アプリの骨格・モード選択タブ・Google Tag Manager動的読み込み
+├── index.html        # アプリの骨格・モード選択タブ
 ├── style.css         # スタイル・アニメーション・レスポンシブCSS
 ├── script.js        # 都道府県SVGデータ・クイズ制御ロジック・音源・紙吹雪
 ├── questions.json    # 知識クイズの問題データベース（605問）
-├── config.js         # Google Tag Manager ID設定ファイル（.gitignore対象）
-├── .gitignore        # Git非管理ファイル指定 (config.js, PROMPT.txt)
+├── config.js         # GTM_ID 設定ファイル（.gitignore対象）
+├── config.example.js # config.js の見本
+├── package.json      # ビルド用スクリプト定義（依存パッケージなし）
+├── scripts/build.mjs # dist/ への出力と Google のタグの埋め込み
+├── .github/workflows/deploy.yml # main への push で GitHub Pages に公開
+├── .gitignore        # Git非管理ファイル指定 (config.js, PROMPT.txt, dist)
 ├── README.md         # 英語版ドキュメント
 └── README.ja.md      # 日本語版ドキュメント
 ```
@@ -55,13 +59,21 @@ python3 -m http.server 8080
 
 ---
 
-## ⚙️ Google Tag Manager 設定
+## ⚙️ アクセス解析 (Google のタグ)
 
-測定IDは `config.js` 内で変更・管理できます。
-```javascript
-window.GTAG_ID = "G-S6QX2XHT2D";
-```
-※ `config.js` は `.gitignore` に指定されているため、リポジトリに公開・コミットされる心配はありません。
+ID を設定したときだけ、ビルド時に Google のタグを `dist/index.html` に埋め込みます。設定しなければ何も埋め込みません。
+ID が `GTM-…` なら Google タグ マネージャー、`G-…` なら Google アナリティクス (gtag.js) のタグになります。
+
+- 手元: プロジェクト直下の `config.js` に `const GTM_ID = 'G-XXXXXXXXXX';` のように書き、`npm run build` を実行する
+- GitHub Pages: リポジトリの Settings → Secrets and variables → Actions → Variables に `GTM_ID` を登録する
+
+環境変数 `GTM_ID` (デプロイ時は `vars.GTM_ID`) があればそれを使い、なければ `config.js` の値を使います。
+※ `config.js` は `.gitignore` に指定されているため、コミットされません。
+
+## 🚢 デプロイ (GitHub Pages)
+
+`main` ブランチに push すると、GitHub Actions (`.github/workflows/deploy.yml`) が `npm run build` で `dist/` を作り、GitHub Pages に公開します。
+Actions の画面から手動で実行することもできます。リポジトリの Settings → Pages の Source は「GitHub Actions」にしてください。
 
 ---
 

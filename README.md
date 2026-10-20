@@ -19,7 +19,7 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 - 🎨 **Bright & Pop Kid-Friendly Design**: Vibrant pastel color scheme, playful animations, and clean rounded typography ([M PLUS Rounded 1c](https://fonts.google.com/specimen/M+PLUS+Rounded+1c)).
 - 🎵 **Web Audio Synthesizer**: Built-in sound effects (correct chime, wrong buzzer, countdown tick-tock, and fanfare) requiring no external audio assets, with an instant mute/unmute toggle.
 - 🎊 **Confetti Celebration**: Dynamic canvas confetti animation triggered upon achieving high scores (80+ points).
-- 📊 **Google Tag Manager Integration**: Analytics tracking loaded dynamically from `config.js`.
+- 📊 **Google Tag Integration**: At build time, a Google Analytics / Tag Manager tag is embedded when `GTM_ID` is set (env var or `config.js`).
 - 📱 **Fully Responsive**: Seamlessly optimized for smartphones, tablets, and desktop displays.
 
 ---
@@ -28,12 +28,16 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 
 ```text
 pref-quiz/
-├── index.html        # Main HTML skeleton, mode selection UI & GTM tag initializer
+├── index.html        # Main HTML skeleton & mode selection UI
 ├── style.css         # Styling, animations, and responsive design system
 ├── script.js        # Core quiz logic, SVG dataset, sound synth, and confetti
 ├── questions.json    # JSON dataset containing 605 knowledge quiz questions
-├── config.js         # Configuration file for GTM Measurement ID (Ignored by Git)
-├── .gitignore        # Git ignore rules (ignores config.js and PROMPT.txt)
+├── config.js         # GTM_ID configuration (Ignored by Git)
+├── config.example.js # Example of config.js
+├── package.json      # Build script definition (no dependencies)
+├── scripts/build.mjs # Outputs dist/ and embeds the Google tag
+├── .github/workflows/deploy.yml # Deploys to GitHub Pages on push to main
+├── .gitignore        # Git ignore rules (config.js, PROMPT.txt, dist)
 ├── README.md         # Documentation in English
 └── README.ja.md      # Documentation in Japanese
 ```
@@ -55,13 +59,21 @@ Navigate to `http://localhost:8080` in your web browser.
 
 ---
 
-## ⚙️ Configuration & Analytics
+## ⚙️ Analytics (Google tag)
 
-To configure Google Tag Manager / Analytics, set your Measurement ID inside `config.js`:
-```javascript
-window.GTAG_ID = "G-S6QX2XHT2D";
-```
-`config.js` is included in `.gitignore` by default so that sensitive tracking keys are not committed to source control.
+The Google tag is embedded into `dist/index.html` at build time only when an ID is set; otherwise nothing is embedded.
+An ID starting with `GTM-` produces a Google Tag Manager tag, and `G-` produces a Google Analytics (gtag.js) tag.
+
+- Locally: write `const GTM_ID = 'G-XXXXXXXXXX';` in `config.js` at the project root, then run `npm run build`
+- GitHub Pages: register `GTM_ID` under Settings → Secrets and variables → Actions → Variables
+
+The `GTM_ID` environment variable (`vars.GTM_ID` when deploying) takes precedence; otherwise the value in `config.js` is used.
+`config.js` is listed in `.gitignore`, so it is never committed.
+
+## 🚢 Deployment (GitHub Pages)
+
+Pushing to `main` runs GitHub Actions (`.github/workflows/deploy.yml`), which builds `dist/` with `npm run build` and publishes it to GitHub Pages.
+It can also be run manually from the Actions tab. Set Settings → Pages → Source to "GitHub Actions".
 
 ---
 
