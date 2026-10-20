@@ -24,7 +24,7 @@ const selected = ref<FreeMode>('silhouette');
 </script>
 
 <template>
-  <section class="card screen active">
+  <section class="card screen active start-screen">
     <div class="title-badge">日本ちずマスター</div>
     <h1 class="main-title">
       <span class="title-sub">形（かたち）と ちしきで学べる！</span>
@@ -34,58 +34,63 @@ const selected = ref<FreeMode>('silhouette');
       </span>
     </h1>
 
-    <DailyPanel
-      :grade="grade"
-      :record="record"
-      :today="today"
-      @update:grade="emit('update:grade', $event)"
-      @start="emit('start', 'daily')"
-      @stamps="emit('stamps')"
-    />
+    <!-- PC では 左に今日のチャレンジ、右に じゆうに あそぶ をならべる (縦にスクロールしなくてよいように) -->
+    <div class="start-columns">
+      <DailyPanel
+        :grade="grade"
+        :record="record"
+        :today="today"
+        @update:grade="emit('update:grade', $event)"
+        @start="emit('start', 'daily')"
+        @stamps="emit('stamps')"
+      />
 
-    <div class="free-play-title">🎮 じゆうに あそぶ</div>
-    <div class="mascot-box">
-      <div class="mascot-img">🗺️</div>
-      <p class="mascot-bubble">
-        日本全国47都道府県の「形」や「名物・日本一（全{{ questionCount }}問）」のクイズに挑戦しよう！
-      </p>
-    </div>
+      <div class="free-play">
+        <div class="free-play-title">🎮 じゆうに あそぶ</div>
+        <div class="mascot-box">
+          <div class="mascot-img">🗺️</div>
+          <p class="mascot-bubble">
+            日本全国47都道府県の「形」や「名物・日本一（全{{ questionCount }}問）」のクイズに挑戦しよう！
+          </p>
+        </div>
 
-    <div class="mode-select-section">
-      <div class="mode-select-title">あそぶモードを選んでね！</div>
-      <div class="mode-select-container">
-        <button
-          v-for="m in MODES"
-          :key="m.mode"
-          type="button"
-          class="mode-btn"
-          :class="{ active: selected === m.mode }"
-          :aria-pressed="selected === m.mode"
-          @click="selected = m.mode"
-        >
-          <span class="mode-icon">{{ m.icon }}</span>
-          <span class="mode-name">{{ m.name }}</span>
+        <div class="mode-select-section">
+          <div class="mode-select-title">あそぶモードを選んでね！</div>
+          <div class="mode-select-container">
+            <button
+              v-for="m in MODES"
+              :key="m.mode"
+              type="button"
+              class="mode-btn"
+              :class="{ active: selected === m.mode }"
+              :aria-pressed="selected === m.mode"
+              @click="selected = m.mode"
+            >
+              <span class="mode-icon">{{ m.icon }}</span>
+              <span class="mode-name">{{ m.name }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="rule-box">
+          <div class="rule-item">
+            <span class="rule-icon">❓</span>
+            <span>ぜんぶで <strong>{{ QUIZ_LENGTH }}問</strong> 出題！</span>
+          </div>
+          <div class="rule-item">
+            <span class="rule-icon">⏱️</span>
+            <span>1問の制限時間は <strong>{{ TIME_LIMIT }}秒</strong>！</span>
+          </div>
+          <div class="rule-item">
+            <span class="rule-icon">🎯</span>
+            <span>4つの選択肢から選ぼう！</span>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary pulse-btn" @click="emit('start', selected)">
+          <span>クイズをはじめる！</span> 🚀
         </button>
       </div>
     </div>
-
-    <div class="rule-box">
-      <div class="rule-item">
-        <span class="rule-icon">❓</span>
-        <span>ぜんぶで <strong>{{ QUIZ_LENGTH }}問</strong> 出題！</span>
-      </div>
-      <div class="rule-item">
-        <span class="rule-icon">⏱️</span>
-        <span>1問の制限時間は <strong>{{ TIME_LIMIT }}秒</strong>！</span>
-      </div>
-      <div class="rule-item">
-        <span class="rule-icon">🎯</span>
-        <span>4つの選択肢から選ぼう！</span>
-      </div>
-    </div>
-
-    <button type="button" class="btn btn-primary pulse-btn" @click="emit('start', selected)">
-      <span>クイズをはじめる！</span> 🚀
-    </button>
   </section>
 </template>

@@ -298,6 +298,100 @@ body {
     line-height: 1.6;
 }
 
+/* スタート画面の2つの列 (せまい画面では縦にならべる) */
+.start-columns,
+.free-play {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* PC: スタート画面を横に広げ、左に今日のチャレンジ、右に じゆうに あそぶ をならべて、縦に短くする */
+@media (min-width: 960px) {
+    .app-container.is-wide {
+        max-width: 1000px;
+    }
+
+    /* 効果音ボタンは、黒板の右上におさめて1行ぶん縦を節約する */
+    .app-container.is-wide .app-header {
+        position: absolute;
+        top: 26px;
+        right: 30px;
+        width: auto;
+        z-index: 2;
+    }
+
+    .start-screen {
+        padding: 16px 32px 24px;
+    }
+
+    .app-container.is-wide + .app-footer {
+        margin-top: 4px;
+    }
+
+    .start-screen .title-badge {
+        margin-bottom: 8px;
+    }
+
+    .start-screen .main-title {
+        margin-bottom: 14px;
+        line-height: 1.15;
+    }
+
+    .start-screen .title-sub {
+        display: block;
+        width: fit-content;
+        margin: 0 auto;
+    }
+
+    .start-screen .title-row {
+        margin-top: 4px;
+    }
+
+    .start-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        align-items: stretch;
+    }
+
+    .start-columns .daily-panel {
+        margin-bottom: 0;
+        justify-content: center;
+        gap: 16px;
+    }
+
+    .free-play {
+        justify-content: space-between;
+    }
+
+    .free-play .free-play-title {
+        margin-bottom: 10px;
+    }
+
+    /* 見出しと同じ内容なので、横ならびのときは出さない */
+    .free-play .mascot-box,
+    .free-play .mode-select-title {
+        display: none;
+    }
+
+    .free-play .mode-select-section {
+        margin-bottom: 10px;
+    }
+
+    .free-play .rule-box {
+        gap: 0;
+        padding: 0 4px;
+        margin-bottom: 14px;
+    }
+
+    .free-play .rule-item {
+        font-size: 0.98rem;
+        padding: 2px 4px 3px;
+    }
+}
+
 /* 今日のチャレンジ */
 .daily-panel {
     width: 100%;

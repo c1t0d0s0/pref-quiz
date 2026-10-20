@@ -91,7 +91,7 @@ onBeforeUnmount(() => stopConfetti());
     <div class="floating-shape shape-6">✨</div>
   </div>
 
-  <main class="app-container">
+  <main class="app-container" :class="{ 'is-wide': screen === 'start' }">
     <header class="app-header">
       <button type="button" class="icon-btn" aria-label="効果音切り替え" @click="toggleSound">
         <span>{{ soundOn ? '🔊' : '🔇' }}</span> 効果音: <span>{{ soundOn ? 'ON' : 'OFF' }}</span>
