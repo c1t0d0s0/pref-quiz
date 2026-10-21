@@ -90,6 +90,12 @@ export function saveGrade(grade: Grade): void {
   write(GRADE_KEY, grade);
 }
 
+/** URL の ?grade=3 のような指定から学年を取り出す。1〜6 以外のときは null */
+export function gradeFromSearch(search: string): Grade | null {
+  const n = Number(new URLSearchParams(search).get('grade'));
+  return isGrade(n) ? n : null;
+}
+
 // ---- 今日のチャレンジ ----
 
 export function loadDailyRecord(): DailyRecord {

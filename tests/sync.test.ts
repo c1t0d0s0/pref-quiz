@@ -5,6 +5,7 @@ import { mergeSnapshots, sameSnapshot } from '../src/core/merge';
 import { emptySnapshot, fromAppDoc, toAppDoc, type Snapshot } from '../src/core/snapshot';
 import {
   currentUid,
+  gradeFromSearch,
   loadDailyRecord,
   loadGrade,
   recordDailyClear,
@@ -267,5 +268,19 @@ describe('Sync', () => {
     current.set('pref-quiz:daily', JSON.stringify({ 2: ['2026-10-18'] }));
     expect(loadGrade()).toBe(2);
     expect(loadDailyRecord()).toEqual({ 2: ['2026-10-18'] });
+  });
+
+  it('URL の ?grade=1〜6 から学年を取り出す', () => {
+    expect(gradeFromSearch('?grade=1')).toBe(1);
+    expect(gradeFromSearch('?grade=2')).toBe(2);
+    expect(gradeFromSearch('?grade=3')).toBe(3);
+    expect(gradeFromSearch('?grade=4')).toBe(4);
+    expect(gradeFromSearch('?grade=5')).toBe(5);
+    expect(gradeFromSearch('?grade=6')).toBe(6);
+    expect(gradeFromSearch('?foo=1&grade=5')).toBe(5);
+    expect(gradeFromSearch('')).toBeNull();
+    expect(gradeFromSearch('?grade=0')).toBeNull();
+    expect(gradeFromSearch('?grade=7')).toBeNull();
+    expect(gradeFromSearch('?grade=abc')).toBeNull();
   });
 });
