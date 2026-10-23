@@ -7,7 +7,7 @@ import type { DailyRecord } from '../core/storage';
 import { GRADES, type Grade } from '../types';
 
 const props = defineProps<{ grade: Grade; record: DailyRecord; today: string }>();
-const emit = defineEmits<{ 'update:grade': [grade: Grade]; start: []; stamps: [] }>();
+const emit = defineEmits<{ 'update:grade': [grade: Grade]; start: []; stamps: []; cards: [] }>();
 
 const dates = computed(() => props.record[props.grade] ?? []);
 const done = computed(() => dates.value.includes(props.today));
@@ -41,6 +41,9 @@ const status = computed(() => {
     <button type="button" class="btn btn-primary daily-start-btn" @click="emit('start')">
       <span>ちょうせん する！</span> ✏️
     </button>
-    <button type="button" class="stamp-link" @click="emit('stamps')">📒 スタンプカードを 見る</button>
+    <div class="daily-links">
+      <button type="button" class="stamp-link" @click="emit('stamps')">📒 スタンプカードを 見る</button>
+      <button type="button" class="stamp-link" @click="emit('cards')">🎴 都道府県カードを 見る</button>
+    </div>
   </div>
 </template>

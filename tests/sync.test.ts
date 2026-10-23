@@ -104,12 +104,21 @@ beforeEach(() => {
 // ---- 記録を合わせる決まり ----
 
 describe('mergeSnapshots', () => {
-  const a: Snapshot = { daily: { 3: ['2026-10-01', '2026-10-03'] }, settings: { grade: 3, at: 100 } };
-  const b: Snapshot = { daily: { 3: ['2026-10-02', '2026-10-03'], 5: ['2026-10-05'] }, settings: { grade: 5, at: 200 } };
+  const a: Snapshot = {
+    daily: { 3: ['2026-10-01', '2026-10-03'] },
+    cards: { 3: { silhouette: [13, 1], knowledge: [13] } },
+    settings: { grade: 3, at: 100 },
+  };
+  const b: Snapshot = {
+    daily: { 3: ['2026-10-02', '2026-10-03'], 5: ['2026-10-05'] },
+    cards: { 3: { silhouette: [2], knowledge: [1] } },
+    settings: { grade: 5, at: 200 },
+  };
 
-  it('クリアした日は両方を合わせ、学年はあとから変えたほう', () => {
+  it('クリアした日・カードの正解は両方を合わせ、学年はあとから変えたほう', () => {
     expect(mergeSnapshots(a, b)).toEqual({
       daily: { 3: ['2026-10-01', '2026-10-02', '2026-10-03'], 5: ['2026-10-05'] },
+      cards: { 3: { silhouette: [1, 2, 13], knowledge: [1, 13] } },
       settings: { grade: 5, at: 200 },
     });
   });
@@ -128,16 +137,41 @@ describe('mergeSnapshots', () => {
 
 describe('Firestore に保存する形', () => {
   it('もとにもどせる', () => {
-    const s: Snapshot = { daily: { 1: ['2026-10-01'], 6: ['2026-10-01', '2026-10-02'] }, settings: { grade: 6, at: 5 } };
+    const s: Snapshot = {
+      daily: { 1: ['2026-10-01'], 6: ['2026-10-01', '2026-10-02'] },
+      cards: { 2: { silhouette: [1, 47], knowledge: [47] } },
+      settings: { grade: 6, at: 5 },
+    };
     const doc = toAppDoc(s, 0);
     expect(doc.activeDays).toEqual(['2026-10-01', '2026-10-02']);
     expect(doc.completed).toContain('daily-g6-2026-10-02');
+    expect(doc.completed).toContain('silhouette-g2-1');
+    expect(doc.completed).toContain('knowledge-g2-47');
+    // 両方に正解した都道府県が、ごほうびのカード
+    expect(doc.inventory).toEqual({ 'card-g2-47': { paid: 0 } });
     expect(fromAppDoc(doc)).toEqual(s);
   });
 
   it('形のくずれたデータは読みとばす', () => {
-    const s = fromAppDoc({ completed: ['daily-g9-2026-10-01', 'daily-g3-oops', 'daily-g3-2026-10-01', 42 as unknown as string], settings: { grade: 'x' } });
-    expect(s).toEqual({ daily: { 3: ['2026-10-01'] }, settings: { grade: null, at: 0 } });
+    const s = fromAppDoc({
+      completed: [
+        'daily-g9-2026-10-01',
+        'daily-g3-oops',
+        'daily-g3-2026-10-01',
+        42 as unknown as string,
+        'silhouette-g7-1',
+        'knowledge-g3-48',
+        'knowledge-g3-0',
+        'map-g3-1',
+        'knowledge-g3-5',
+      ],
+      settings: { grade: 'x' },
+    });
+    expect(s).toEqual({
+      daily: { 3: ['2026-10-01'] },
+      cards: { 3: { silhouette: [], knowledge: [5] } },
+      settings: { grade: null, at: 0 },
+    });
   });
 });
 
@@ -260,7 +294,7 @@ describe('Sync', () => {
     expect([...current.keys()].some((k) => k.startsWith('pref-quiz:u:alice:'))).toBe(false);
     expect(loadDailyRecord()).toEqual({ 1: ['2026-10-01'] });
     expect(loadGrade()).toBe(3);
-    expect(sameSnapshot(cloud.data.get('alice')!, { daily: { 5: ['2026-10-20'] }, settings: { grade: 5, at: cloud.data.get('alice')!.settings.at } })).toBe(true);
+    expect(sameSnapshot(cloud.data.get('alice')!, { daily: { 5: ['2026-10-20'] }, cards: {}, settings: { grade: 5, at: cloud.data.get('alice')!.settings.at } })).toBe(true);
   });
 
   it('前からの (ログイン機能を入れる前の) 記録の置き場所を、そのまま読める', () => {

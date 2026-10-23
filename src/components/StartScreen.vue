@@ -11,7 +11,7 @@ import SparrowIcon from './SparrowIcon.vue';
 type FreeMode = Exclude<Mode, 'daily'>;
 
 const props = defineProps<{ grade: Grade; record: DailyRecord; today: string; questionCount: number }>();
-const emit = defineEmits<{ 'update:grade': [grade: Grade]; start: [mode: Mode]; stamps: []; battle: [] }>();
+const emit = defineEmits<{ 'update:grade': [grade: Grade]; start: [mode: Mode]; stamps: []; cards: []; battle: [] }>();
 
 // 問題数は 100 問単位で「○○問+」と表示する (問題を足しても書きかえなくてよいように)
 const roundedCount = `${Math.floor(props.questionCount / 100) * 100}問+`;
@@ -44,6 +44,7 @@ const selected = ref<FreeMode>('silhouette');
         @update:grade="emit('update:grade', $event)"
         @start="emit('start', 'daily')"
         @stamps="emit('stamps')"
+        @cards="emit('cards')"
       />
 
       <div class="free-play">
@@ -85,6 +86,10 @@ const selected = ref<FreeMode>('silhouette');
           <div class="rule-item">
             <span class="rule-icon">🎯</span>
             <span>4つの選択肢から選ぼう！</span>
+          </div>
+          <div class="rule-item">
+            <span class="rule-icon">🎴</span>
+            <span>おなじ 都道府県の シルエットと ちしきに 正解すると <strong>カード</strong>が もらえる！</span>
           </div>
         </div>
 

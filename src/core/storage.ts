@@ -1,11 +1,11 @@
-// 学年と、今日のチャレンジをクリアした日の記録 (この端末の localStorage)
+// 学年と、今日のチャレンジをクリアした日・都道府県カードの記録 (この端末の localStorage)
 //
 // ログインしていない人の記録は GUEST_PREFIX の下 (前からの置き場所なので、今までの記録がそのまま使える)。
 // ログイン中の人の記録 (Firestore の写し) は、人ごとに別の場所に置き、ログアウトしたら消す。
 import { isGrade, type Grade } from '../types';
-import { emptySnapshot, type DailyRecord, type Snapshot } from './snapshot';
+import { emptySnapshot, type CardProgress, type CardRecord, type DailyRecord, type Snapshot } from './snapshot';
 
-export type { DailyRecord } from './snapshot';
+export type { CardRecord, DailyRecord } from './snapshot';
 
 const GUEST_PREFIX = 'pref-quiz:';
 const userPrefix = (uid: string) => `pref-quiz:u:${uid}:`;
@@ -15,7 +15,8 @@ const ACTIVE_UID_KEY = 'pref-quiz:auth-uid';
 const GRADE_KEY = 'grade';
 const DAILY_KEY = 'daily';
 const SETTINGS_AT_KEY = 'settings-at';
-const KEYS = [GRADE_KEY, DAILY_KEY, SETTINGS_AT_KEY];
+const CARDS_KEY = 'cards';
+const KEYS = [GRADE_KEY, DAILY_KEY, SETTINGS_AT_KEY, CARDS_KEY];
 
 /** 学年ごとに残しておく日数 (スタンプカードで1年前までさかのぼれるように) */
 export const DAILY_KEEP = 400;
@@ -119,12 +120,35 @@ export function recordDailyClear(grade: Grade, date: string): DailyRecord {
   return record;
 }
 
+// ---- 都道府県カード ----
+
+const prefIds = (v: unknown): number[] =>
+  Array.isArray(v) ? v.filter((x): x is number => Number.isInteger(x) && x >= 1 && x <= 47) : [];
+
+export function loadCardRecord(): CardRecord {
+  const record = read<unknown>(CARDS_KEY);
+  if (!record || typeof record !== 'object') return {};
+  const out: CardRecord = {};
+  for (const [grade, progress] of Object.entries(record)) {
+    const g = Number(grade);
+    if (!isGrade(g) || !progress || typeof progress !== 'object') continue;
+    const p = progress as Partial<Record<keyof CardProgress, unknown>>;
+    out[g] = { silhouette: prefIds(p.silhouette), knowledge: prefIds(p.knowledge) };
+  }
+  return out;
+}
+
+export function saveCardRecord(record: CardRecord): void {
+  write(CARDS_KEY, record);
+}
+
 // ---- 記録をまるごと出し入れする (ログイン・Firestore との同期で使う) ----
 
 /** 今の場所にある記録を、まるごと取り出す */
 export function exportSnapshot(): Snapshot {
   const s = emptySnapshot();
   s.daily = loadDailyRecord();
+  s.cards = loadCardRecord();
   const grade = read<number>(GRADE_KEY);
   const at = read<number>(SETTINGS_AT_KEY);
   s.settings = { grade: isGrade(grade) ? grade : null, at: typeof at === 'number' ? at : 0 };
@@ -139,6 +163,7 @@ export function importSnapshot(s: Snapshot): void {
   muted = true;
   try {
     write(DAILY_KEY, s.daily);
+    write(CARDS_KEY, s.cards);
     if (s.settings.grade) write(GRADE_KEY, s.settings.grade);
     write(SETTINGS_AT_KEY, s.settings.at);
   } finally {
