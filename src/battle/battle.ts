@@ -27,7 +27,9 @@ export const COUNTDOWN_MS = 3500;
 /** 答えを見せておく時間。そのあと次の問題になる */
 export const REVEAL_MS = 2000;
 /** 1問の制限時間 */
-export const TIME_LIMIT_MS = 15000;
+export const TIME_LIMIT_MS = 30000;
+/** だれも正解しないまま これだけたつと、ヒント (prefectures.json の hint) を出す */
+export const HINT_AFTER_MS = 15000;
 /** 作ってからこれだけたった部屋は、だれが消してもよい (database.rules.json と同じ値) */
 export const ROOM_TTL_MS = 24 * 60 * 60 * 1000;
 /** まちがいの選択肢に入れる「形が似ている都道府県」の数 (ひとりで遊ぶシルエットモードと同じ) */
@@ -167,6 +169,11 @@ export function settled(room: Room, q: number): boolean {
   if (takeOf(room, q)) return true;
   const here = playersList(room).filter((p) => p.online);
   return here.length > 0 && here.every((p) => faulted(room, q, p.seat));
+}
+
+/** q 問目のヒントを出すか: 出してから HINT_AFTER_MS たっても、まだだれも正解していない */
+export function showsHint(room: Room, q: number, now: number): boolean {
+  return !takeOf(room, q) && now >= (room.qAt ?? 0) + HINT_AFTER_MS;
 }
 
 export interface StandingRow {

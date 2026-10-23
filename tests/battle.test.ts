@@ -8,12 +8,13 @@ import {
   makeGame,
   parseCode,
   settled,
+  showsHint,
   standings,
   takeOf,
   type Room,
 } from '../src/battle/battle';
 import { accountUid } from '../src/cloud/sync';
-import { SIMILAR } from '../src/data';
+import { PREFECTURES, SIMILAR } from '../src/data';
 
 const room = (over: Partial<Room> = {}): Room => ({
   app: 'pref-quiz',
@@ -127,6 +128,22 @@ describe('札と順位', () => {
     // 札もおてつきも同じなら同じ順位
     const tie = standings(room({ takes: { 0: { seat: '0', round: 1, at: 0 }, 1: { seat: '1', round: 1, at: 0 } } }));
     expect(tie.map((x) => x.rank)).toEqual([1, 1, 3]);
+  });
+});
+
+describe('ヒント', () => {
+  it('問題を出してから15秒たっても だれも正解していなければ、ヒントを出す', () => {
+    const r = room({ qAt: 1000 });
+    expect(showsHint(r, 0, 1000 + 14999)).toBe(false);
+    expect(showsHint(r, 0, 1000 + 15000)).toBe(true);
+    // おてつきだけなら、まだ出す
+    expect(showsHint(room({ qAt: 1000, faults: { 0: { 0: true } } }), 0, 1000 + 15000)).toBe(true);
+    // だれかが とったら出さない
+    expect(showsHint(room({ qAt: 1000, takes: { 0: { seat: '1', round: 1, at: 0 } } }), 0, 1000 + 20000)).toBe(false);
+  });
+
+  it('47都道府県すべてに ヒントの文章がある', () => {
+    expect(PREFECTURES.every((p) => p.hint.trim().length > 0)).toBe(true);
   });
 });
 

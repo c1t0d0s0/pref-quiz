@@ -11,6 +11,7 @@ import {
   faulted,
   makeGame,
   settled,
+  showsHint,
   standings,
   takeOf,
   type Room,
@@ -74,6 +75,10 @@ const left = computed(() =>
   shownQ.value === null ? LIMIT_SEC : Math.min(LIMIT_SEC, Math.max(0, Math.ceil((qAt.value + TIME_LIMIT_MS - now.value) / 1000))),
 );
 const rows = computed(() => standings(props.room));
+/** 15秒たっても だれも正解していなければ、ヒントを出す (答えを見せたあとは出さない) */
+const hint = computed(() =>
+  item.value && shownQ.value === q.value && !revealed.value && showsHint(props.room, q.value, now.value) ? item.value.answer.hint : '',
+);
 
 const feedback = computed<{ text: string; tone: '' | 'correct' | 'incorrect' }>(() => {
   if (shownQ.value === null) return { text: 'シルエットを よく 見てね！', tone: '' };
@@ -161,7 +166,10 @@ onBeforeUnmount(() => clearInterval(timer));
       <div v-if="shownQ === null" class="silhouette-card battle-countdown">
         <span class="battle-countdown-num">{{ Math.max(countdown, 1) }}</span>
       </div>
-      <QuestionCard v-else-if="item" :item="item" :revealed="revealed" />
+      <div v-else-if="item" class="battle-question">
+        <QuestionCard :item="item" :revealed="revealed" />
+        <p v-if="hint" class="battle-hint" role="status">💡 ヒント: {{ hint }}</p>
+      </div>
     </div>
 
     <p class="battle-feedback" :class="feedback.tone" role="status">{{ feedback.text }}</p>

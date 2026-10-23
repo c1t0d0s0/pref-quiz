@@ -1982,3 +1982,35 @@ body {
     flex: none;
     white-space: nowrap;
 }
+
+/* たいせん のヒント: シルエットの わくの下のほうに重ねて出す (問題の高さが変わらないように) */
+.battle-question {
+    position: relative;
+}
+
+.battle-hint {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 8px;
+    padding: 4px 10px;
+    border-radius: var(--hand-radius-sm);
+    background: rgba(30, 42, 35, 0.88);
+    border: 2px dashed var(--chalk-yellow);
+    color: var(--chalk-yellow);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-shadow: var(--chalk-glow);
+    animation: fadeInExp 0.4s ease;
+}
+
+@media (max-width: 480px) {
+    .battle-hint {
+        left: 6px;
+        right: 6px;
+        bottom: 4px;
+        padding: 2px 8px;
+        font-size: 0.85rem;
+    }
+}

@@ -151,7 +151,8 @@ An online buzzer-style battle built the same way as kanji-quiz's 意味かるた
 - The host makes a room (5, 10 or 20 questions); others join with the 5-digit code, the QR code or the invite URL (`?battle=12345`). 2–8 players.
 - When the host presses Start, a 3.5-second countdown runs, then everyone sees the same silhouette and the same 6 choices.
 - The first correct pick takes the card. A wrong pick is a fault (おてつき) and sits out that question.
-- When someone takes the card, everyone has faulted, or 15 seconds pass, the answer is shown; 2 seconds later the host's device moves on to the next question.
+- Each question has 30 seconds. If nobody has answered correctly after 15 seconds, a hint (the `hint` text in `src/data/prefectures.json`) appears.
+- When someone takes the card, everyone has faulted, or 30 seconds pass, the answer is shown; 2 seconds later the host's device moves on to the next question.
 - Results rank players by cards taken, then fewest faults. The host can start another round in the same room.
 - Questions and choices come from the room's seed, so every device sees the same ones; 2 of the 5 wrong choices are similar-shaped prefectures.
 - No Google account is needed (anonymous sign-in). Anonymous sign-in does not count as logged in, and battles are not saved to records or stamps.
