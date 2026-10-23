@@ -40,6 +40,12 @@ describe('ちしき問題', () => {
     for (const q of QUESTIONS) expect(q.prefName, `id ${q.id}`).toBe(names.get(q.prefId));
   });
 
+  // どの学年でも、47まい全部の都道府県カードを集められるように
+  it.each(GRADES)('%i年生の問題に、47都道府県ぜんぶが答えの問題がある', (grade) => {
+    const prefs = new Set(QUESTIONS.filter((q) => q.grade === grade).map((q) => q.prefId));
+    for (const p of PREFECTURES) expect(prefs.has(p.id), p.name).toBe(true);
+  });
+
   it.each(GRADES)(`%i年生の問題が ${MIN_PER_GRADE} 問以上ある`, (grade) => {
     expect(QUESTIONS.filter((q) => q.grade === grade).length).toBeGreaterThanOrEqual(MIN_PER_GRADE);
   });

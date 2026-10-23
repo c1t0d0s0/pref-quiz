@@ -16,6 +16,7 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 - 🔑 **Optional Google Login**: Logged-in players' records are saved to Firestore and follow them across browsers and devices; without login, records stay in the browser.
 - ⚔️ **Online Silhouette Battle (シルエット たいせん)**: 2–8 players join one room from their own devices, see the same silhouette at the same time, and the first to pick the right prefecture takes the card (the same game as kanji-quiz's 意味かるた たいせん). Six choices per question. Join with a 5-digit code, QR code or URL; no Google account needed.
 - 📒 **Stamp Card (スタンプカード)**: Finishing the daily challenge stamps that day on a per-grade monthly calendar, viewable up to a year back. Each day's stamp is a prefecture silhouette chosen by date.
+- 🎴 **Prefecture Cards (都道府県カード)**: Answer both a silhouette question and a knowledge question about the same prefecture correctly (in any quizzes, not necessarily the same one) to earn that prefecture's card. Cards show the silhouette with a frame color per grade, and are collected per grade (47 each). Silhouette answers count for the selected grade; knowledge answers count for the question's grade. Battles don't count.
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
   - 💡 **Knowledge Quiz (ちしき)**: 760+ trivia questions covering geography, landmarks, specialties, population, and records.
@@ -46,12 +47,13 @@ pref-quiz/
 │   ├── battle/battle.ts        # Battle rules (questions with 6 choices, cards, faults, standings)
 │   ├── components/             # StartScreen, DailyPanel, QuizScreen, QuestionCard, TimerBar,
 │   │                           # ResultScreen, ReviewList, StampScreen, StampCard, StampMark, SparrowIcon,
-│   │                           # battle/ (entry, lobby, play, result)
+│   │                           # cards/ (CardScreen, PrefCard), battle/ (entry, lobby, play, result)
 │   ├── cloud/                  # Google login and Firestore sync (firebase.ts), battle networking (battle-net.ts)
 │   ├── core/                   # UI-independent logic (easy to unit test)
 │   │   ├── quiz.ts             # Building quizzes, options (4 choices / 6 in battles), ranks
 │   │   ├── daily.ts            # Daily challenge selection (10 questions from date and grade)
 │   │   ├── stamps.ts           # Stamp card calendar and stamp pictures
+│   │   ├── cards.ts            # Prefecture cards (correct-answer record, earning rule)
 │   │   ├── storage.ts          # Saved grade and cleared days (localStorage)
 │   │   ├── snapshot.ts / merge.ts  # Firestore document shape and merge rules
 │   │   ├── date.ts / rng.ts    # JST dates, seeded random numbers

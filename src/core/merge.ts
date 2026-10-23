@@ -2,6 +2,7 @@
 // どの関数も、同じものを 2 回合わせても変わらず、a と b を入れかえても同じ結果になる。
 // そのため、何回やっても・どの順でやっても、記録がこわれたり二重にふえたりしない。
 import { GRADES } from '../types';
+import { mergeCards } from './cards';
 import { DAILY_KEEP } from './storage';
 import type { DailyRecord, Settings, Snapshot } from './snapshot';
 
@@ -23,7 +24,11 @@ export function mergeSettings(a: Settings, b: Settings): Settings {
 }
 
 export function mergeSnapshots(a: Snapshot, b: Snapshot): Snapshot {
-  return { daily: mergeDaily(a.daily, b.daily), settings: mergeSettings(a.settings, b.settings) };
+  return {
+    daily: mergeDaily(a.daily, b.daily),
+    cards: mergeCards(a.cards, b.cards),
+    settings: mergeSettings(a.settings, b.settings),
+  };
 }
 
 /** 記録の中身が同じか (ならび順のちがいは気にしない) */
