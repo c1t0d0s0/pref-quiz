@@ -8,6 +8,8 @@ export const QUIZ_LENGTH = 10;
 export const TIME_LIMIT = 30; // 1問の制限時間 (秒)
 export const POINTS_PER_QUESTION = 10;
 export const OPTION_COUNT = 4;
+/** 対戦の選択肢の数 (早押しなので、当てずっぽうで取りにくいよう多めにする) */
+export const BATTLE_OPTION_COUNT = 6;
 
 const silhouetteItem = (answer: Prefecture): QuizItem => ({ type: 'silhouette', answer });
 const knowledgeItem = (question: KnowledgeQuestion): QuizItem => ({
@@ -59,10 +61,15 @@ export function similarCountFor(mode: Mode, grade: Grade): number {
 export const showsKana = (quiz: Quiz): boolean => quiz.mode === 'daily' && quiz.grade <= 2;
 
 /**
- * 正解1つと、まちがい3つの選択肢。まちがいには形が似ている都道府県を similarCount 個まで優先して入れる。
+ * 正解1つと、まちがい (count - 1) 個の選択肢。まちがいには形が似ている都道府県を similarCount 個まで優先して入れる。
  * 「秋田県と どこ？」のように問題文に出てくる都道府県は、答えと紛らわしいので入れない
  */
-export function makeOptions(item: QuizItem, similarCount: number, rng: Rng = Math.random): Prefecture[] {
+export function makeOptions(
+  item: QuizItem,
+  similarCount: number,
+  rng: Rng = Math.random,
+  count: number = OPTION_COUNT,
+): Prefecture[] {
   const answer = item.answer;
   const text = item.type === 'knowledge' ? item.question.question : '';
   const similarNames = SIMILAR[answer.id] ?? [];
@@ -74,7 +81,7 @@ export function makeOptions(item: QuizItem, similarCount: number, rng: Rng = Mat
   const others = shuffle(
     usable.filter((p) => !similar.includes(p)),
     rng,
-  ).slice(0, OPTION_COUNT - 1 - similar.length);
+  ).slice(0, count - 1 - similar.length);
   return shuffle([answer, ...similar, ...others], rng);
 }
 

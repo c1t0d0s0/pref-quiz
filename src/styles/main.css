@@ -1537,3 +1537,448 @@ body {
         white-space: nowrap;
     }
 }
+
+/* --------------------------------------------------------------------------
+   6. シルエット たいせん
+   -------------------------------------------------------------------------- */
+/* スタート画面の入り口 */
+.battle-open-btn {
+    margin-top: 14px;
+    background: transparent;
+    border: 2px dashed var(--chalk-blue);
+    border-radius: var(--hand-radius-sm);
+    color: var(--chalk-blue);
+    font-family: var(--font-hand);
+    font-size: 1.1rem;
+    padding: 6px 18px;
+    cursor: pointer;
+    text-shadow: var(--chalk-glow);
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+    .battle-open-btn:hover {
+        background: rgba(159, 211, 240, 0.1);
+        transform: translateY(-1px) rotate(-0.5deg);
+    }
+}
+
+.battle-entry,
+.battle-lobby,
+.battle-play,
+.battle-result {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.battle-title {
+    font-family: var(--font-hand);
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--chalk);
+    text-shadow: var(--chalk-glow);
+}
+
+.battle-lead,
+.battle-setting {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
+    line-height: 1.6;
+}
+
+.battle-setting {
+    color: var(--chalk-yellow);
+    margin-top: -8px;
+}
+
+.battle-field {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.battle-label {
+    flex: none;
+    font-family: var(--font-hand);
+    font-size: 1.05rem;
+    color: var(--chalk);
+}
+
+.battle-input {
+    width: 100%;
+    min-width: 0;
+    background: rgba(0, 0, 0, 0.18);
+    border: 2px solid var(--chalk-faint);
+    border-radius: var(--hand-radius-sm);
+    color: var(--chalk);
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    outline: none;
+}
+
+.battle-input:focus {
+    border-color: var(--chalk-yellow);
+}
+
+.battle-input::placeholder {
+    color: rgba(244, 241, 232, 0.35);
+}
+
+.battle-box {
+    width: 100%;
+    border: 2px dashed var(--chalk-faint);
+    border-radius: var(--hand-radius);
+    padding: 12px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.battle-box-title {
+    align-self: flex-start;
+    font-family: var(--font-hand);
+    font-size: 1.2rem;
+    color: var(--chalk);
+}
+
+.battle-pills {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.btn-primary.battle-main-btn {
+    font-size: 1.3rem;
+    padding: 10px 30px;
+    white-space: nowrap;
+}
+
+.btn-primary:disabled {
+    opacity: 0.45;
+    cursor: default;
+    transform: none;
+}
+
+.battle-join-row,
+.battle-url-row {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.battle-code-input {
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    text-align: center;
+}
+
+.btn-primary.battle-join-btn {
+    flex: none;
+    font-size: 1.15rem;
+    padding: 8px 20px;
+}
+
+.battle-message {
+    min-height: 1.5em;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+}
+
+.battle-text-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px dashed var(--chalk-faint);
+    color: var(--chalk-dim);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 2px 4px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.battle-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+}
+
+/* 待ち画面 */
+.battle-invite {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.battle-code-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.battle-code {
+    font-family: var(--font-hand);
+    font-size: 3rem;
+    letter-spacing: 8px;
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+    border-bottom: 3px solid var(--chalk-yellow);
+    padding: 0 6px 0 14px;
+}
+
+.battle-qr {
+    border-radius: 8px;
+    border: 4px solid var(--chalk);
+    background: var(--chalk);
+}
+
+.battle-url {
+    font-size: 0.85rem;
+}
+
+.battle-players {
+    width: 100%;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.battle-player {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 2px solid var(--chalk-dim);
+    border-radius: var(--hand-radius-sm);
+    padding: 4px 12px;
+    font-weight: 600;
+    color: var(--chalk);
+}
+
+.battle-player.is-offline {
+    opacity: 0.5;
+}
+
+.battle-tag {
+    font-size: 0.75rem;
+    color: var(--chalk-blue);
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    padding: 0 5px;
+}
+
+.battle-tag.is-me {
+    color: var(--chalk-pink);
+}
+
+/* たいせん中 */
+.battle-play .quiz-info-bar,
+.battle-play .timer-container,
+.battle-play .question-box {
+    margin-bottom: 0;
+}
+
+.battle-scores {
+    width: 100%;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+
+.battle-score {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    border: 2px dashed var(--chalk-faint);
+    border-radius: var(--hand-radius-sm);
+    padding: 1px 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--chalk-dim);
+}
+
+.battle-score.is-me {
+    border-style: solid;
+    border-color: var(--chalk-pink);
+    color: var(--chalk-pink);
+}
+
+.battle-score.is-offline {
+    opacity: 0.45;
+}
+
+.battle-score-num {
+    font-size: 1.15rem;
+    color: var(--chalk-yellow);
+}
+
+.battle-play .silhouette-card {
+    padding: 10px;
+}
+
+.battle-play .silhouette-svg-wrapper {
+    height: 190px;
+}
+
+.battle-countdown {
+    height: 212px;
+}
+
+.battle-countdown-num {
+    font-family: var(--font-hand);
+    font-size: 5rem;
+    color: var(--chalk-yellow);
+    text-shadow: var(--chalk-glow);
+    animation: correctBounce 1s ease infinite;
+}
+
+.battle-feedback {
+    min-height: 1.6em;
+    font-family: var(--font-hand);
+    font-size: 1.25rem;
+    color: var(--chalk-dim);
+    text-shadow: var(--chalk-glow);
+}
+
+.battle-feedback.correct {
+    color: var(--chalk-green);
+}
+
+.battle-feedback.incorrect {
+    color: var(--chalk-pink);
+}
+
+/* 6択: PC は 3×2 */
+.options-grid.is-six {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.options-grid.is-six .option-btn {
+    font-size: 1.15rem;
+    padding: 12px 6px;
+    word-break: keep-all;
+}
+
+.option-btn.is-picked {
+    border: 3px solid var(--chalk-yellow);
+    color: var(--chalk-yellow);
+}
+
+/* 結果 */
+.battle-standings {
+    width: 100%;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.battle-standing {
+    display: grid;
+    grid-template-columns: 4.2em 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border-bottom: 1px dashed var(--chalk-faint);
+    font-weight: 600;
+    color: var(--chalk);
+    text-align: left;
+}
+
+.battle-standing.is-me {
+    color: var(--chalk-pink);
+}
+
+.battle-standing.is-offline {
+    opacity: 0.5;
+}
+
+.battle-rank {
+    font-family: var(--font-hand);
+    color: var(--chalk-yellow);
+    white-space: nowrap;
+}
+
+.battle-standing-cards {
+    color: var(--chalk-yellow);
+    font-size: 1.1rem;
+}
+
+.battle-standing-faults {
+    font-size: 0.85rem;
+    color: var(--chalk-dim);
+}
+
+/* スマートフォン: 6択は 2×3、シルエットは少し小さく */
+@media (max-width: 480px) {
+    .start-screen .battle-open-btn {
+        margin-top: 10px;
+        font-size: 1rem;
+    }
+
+    .battle-title {
+        font-size: 1.5rem;
+    }
+
+    .options-grid.is-six {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .options-grid.is-six .option-btn {
+        font-size: 1.1rem;
+        padding: 10px 4px;
+    }
+
+    .battle-play {
+        gap: 10px;
+    }
+
+    .battle-play .silhouette-svg-wrapper {
+        height: 150px;
+    }
+
+    .battle-countdown {
+        height: 172px;
+    }
+
+    .battle-code {
+        font-size: 2.4rem;
+        letter-spacing: 5px;
+    }
+
+    .battle-standing {
+        grid-template-columns: 3.8em 1fr auto;
+        gap: 6px;
+    }
+
+    .battle-standing-faults {
+        grid-column: 2 / -1;
+        margin-top: -4px;
+    }
+}
+
+.battle-url-row .icon-btn {
+    flex: none;
+    white-space: nowrap;
+}

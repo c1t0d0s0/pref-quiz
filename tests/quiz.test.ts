@@ -1,7 +1,7 @@
 // 問題の組み立て・選択肢・称号
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../src/core/rng';
-import { buildQuiz, makeOptions, OPTION_COUNT, QUIZ_LENGTH, rankFor, showsKana, similarCountFor } from '../src/core/quiz';
+import { BATTLE_OPTION_COUNT, buildQuiz, makeOptions, OPTION_COUNT, QUIZ_LENGTH, rankFor, showsKana, similarCountFor } from '../src/core/quiz';
 import { prefectureById, QUESTIONS, SIMILAR } from '../src/data';
 import type { QuizItem } from '../src/types';
 
@@ -35,6 +35,15 @@ describe('makeOptions', () => {
       const options = makeOptions(silhouette(id), 2, rng());
       expect(options).toHaveLength(OPTION_COUNT);
       expect(new Set(options.map((p) => p.id)).size).toBe(OPTION_COUNT);
+      expect(options.some((p) => p.id === id)).toBe(true);
+    }
+  });
+
+  it('たいせん では、正解をふくむ、ちがう6つの都道府県', () => {
+    for (let id = 1; id <= 47; id++) {
+      const options = makeOptions(silhouette(id), 2, rng(), BATTLE_OPTION_COUNT);
+      expect(options).toHaveLength(6);
+      expect(new Set(options.map((p) => p.id)).size).toBe(6);
       expect(options.some((p) => p.id === id)).toBe(true);
     }
   });

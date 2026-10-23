@@ -1,12 +1,13 @@
 <!-- 画面の切りかえ (スタート → クイズ → 結果、スタンプカード) と、学年・今日のチャレンジの記録 -->
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
 import AccountBox from './components/AccountBox.vue';
 import StartScreen from './components/StartScreen.vue';
 import QuizScreen from './components/QuizScreen.vue';
 import ResultScreen from './components/ResultScreen.vue';
 import StampScreen from './components/StampScreen.vue';
-import { cloudAvailable, getSync, startCloud } from './cloud';
+import { parseCode } from './battle/battle';
+import { battleAvailable, cloudAvailable, getSync, startCloud } from './cloud';
 import type { SyncStatus } from './cloud/sync';
 import { startConfetti } from './core/confetti';
 import { streakOf } from './core/daily';
@@ -17,9 +18,15 @@ import { loadDailyRecord, loadGrade, recordDailyClear, saveGrade } from './core/
 import { QUESTIONS } from './data';
 import type { AnswerRecord, Grade, Mode, Quiz } from './types';
 
-type Screen = 'start' | 'quiz' | 'result' | 'stamps';
+// たいせん の画面は、開いたときにだけ読みこむ
+const BattleScreen = defineAsyncComponent(() => import('./components/battle/BattleScreen.vue'));
 
-const screen = ref<Screen>('start');
+type Screen = 'start' | 'quiz' | 'result' | 'stamps' | 'battle';
+
+/** 招待の URL (?battle=12345) から来たときの、たいせんコード */
+const invitedCode = ref(battleAvailable ? parseCode(new URLSearchParams(location.search).get('battle') ?? '') : null);
+
+const screen = ref<Screen>(invitedCode.value ? 'battle' : 'start');
 const grade = ref<Grade>(loadGrade());
 const record = ref(loadDailyRecord());
 const today = ref(jstDate());
@@ -71,9 +78,16 @@ function openStamps() {
   screen.value = 'stamps';
 }
 
+function openBattle() {
+  sound.init();
+  invitedCode.value = null;
+  screen.value = 'battle';
+}
+
 function backToStart() {
   sound.init();
   stopConfetti();
+  invitedCode.value = null;
   today.value = jstDate();
   screen.value = 'start';
 }
@@ -131,6 +145,7 @@ onBeforeUnmount(() => stopConfetti());
       @update:grade="setGrade"
       @start="start"
       @stamps="openStamps"
+      @battle="openBattle"
     />
     <QuizScreen v-else-if="screen === 'quiz' && quiz" :quiz="quiz" @finish="finish" />
     <ResultScreen
@@ -148,6 +163,7 @@ onBeforeUnmount(() => stopConfetti());
       :pressed="pressedStamp"
       @back="backToStart"
     />
+    <BattleScreen v-else-if="screen === 'battle'" :invited="invitedCode" @home="backToStart" />
   </main>
 
   <footer class="app-footer">

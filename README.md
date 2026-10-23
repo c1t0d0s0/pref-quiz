@@ -14,6 +14,7 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
   - Grades 1–2 use mostly hiragana and show furigana on the choices; upper grades mix in similar-shaped prefectures as wrong choices.
   - Cleared days and the current streak are saved in this browser (localStorage). Replays are allowed.
 - 🔑 **Optional Google Login**: Logged-in players' records are saved to Firestore and follow them across browsers and devices; without login, records stay in the browser.
+- ⚔️ **Online Silhouette Battle (シルエット たいせん)**: 2–8 players join one room from their own devices, see the same silhouette at the same time, and the first to pick the right prefecture takes the card (the same game as kanji-quiz's 意味かるた たいせん). Six choices per question. Join with a 5-digit code, QR code or URL; no Google account needed.
 - 📒 **Stamp Card (スタンプカード)**: Finishing the daily challenge stamps that day on a per-grade monthly calendar, viewable up to a year back. Each day's stamp is a prefecture silhouette chosen by date.
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
@@ -42,11 +43,13 @@ pref-quiz/
 │   ├── main.ts                 # App entry point
 │   ├── App.vue                 # Screen flow (start → quiz → result), grade, daily record
 │   ├── types.ts                # Shared types (grade, prefecture, question, quiz)
+│   ├── battle/battle.ts        # Battle rules (questions with 6 choices, cards, faults, standings)
 │   ├── components/             # StartScreen, DailyPanel, QuizScreen, QuestionCard, TimerBar,
-│   │                           # ResultScreen, ReviewList, StampScreen, StampCard, StampMark, SparrowIcon
-│   ├── cloud/                  # Google login and Firestore sync (only firebase.ts depends on Firebase)
+│   │                           # ResultScreen, ReviewList, StampScreen, StampCard, StampMark, SparrowIcon,
+│   │                           # battle/ (entry, lobby, play, result)
+│   ├── cloud/                  # Google login and Firestore sync (firebase.ts), battle networking (battle-net.ts)
 │   ├── core/                   # UI-independent logic (easy to unit test)
-│   │   ├── quiz.ts             # Building quizzes, 4-choice options, ranks
+│   │   ├── quiz.ts             # Building quizzes, options (4 choices / 6 in battles), ranks
 │   │   ├── daily.ts            # Daily challenge selection (10 questions from date and grade)
 │   │   ├── stamps.ts           # Stamp card calendar and stamp pictures
 │   │   ├── storage.ts          # Saved grade and cleared days (localStorage)
@@ -64,7 +67,7 @@ pref-quiz/
 ├── public/                     # Files served as-is (favicon.svg / favicon.ico / apple-touch-icon.png)
 ├── tests/                      # Vitest tests (data, daily selection, options, quiz screen)
 ├── vite.config.ts              # Vite config, Google tag injection, Firebase settings
-├── firestore.rules / firebase.json  # Firestore rules and emulator config
+├── firestore.rules / database.rules.json / firebase.json  # Firestore and Realtime Database rules, emulator config
 ├── config.example.js           # Example of config.js (config.js is git-ignored)
 └── .github/workflows/deploy.yml  # Deploys to GitHub Pages on push to main
 ```
@@ -134,11 +137,36 @@ When login fails, the Firebase error code is shown under the button (`auth/unaut
 ### Running against the emulator (development)
 
 ```sh
-npx firebase-tools emulators:start --only auth,firestore --project demo-pref-quiz
-FIREBASE_API_KEY=x FIREBASE_AUTH_DOMAIN=localhost FIREBASE_PROJECT_ID=demo-pref-quiz FIREBASE_APP_ID=x FIREBASE_EMULATOR=1 npm run dev
+npx firebase-tools emulators:start --only auth,firestore,database --project demo-pref-quiz
+FIREBASE_API_KEY=x FIREBASE_AUTH_DOMAIN=localhost FIREBASE_PROJECT_ID=demo-pref-quiz FIREBASE_APP_ID=x \
+  FIREBASE_DATABASE_URL=https://demo-pref-quiz-default-rtdb.firebaseio.com FIREBASE_EMULATOR=1 npm run dev
 ```
 
 The emulator has no Google sign-in page: set `window.__testUser = 'test-user'` in the devtools console, then press 「Googleで ログイン」.
+
+## ⚔️ Silhouette Battle (Firebase Realtime Database)
+
+An online buzzer-style battle built the same way as kanji-quiz's 意味かるた たいせん.
+
+- The host makes a room (5, 10 or 20 questions); others join with the 5-digit code, the QR code or the invite URL (`?battle=12345`). 2–8 players.
+- When the host presses Start, a 3.5-second countdown runs, then everyone sees the same silhouette and the same 6 choices.
+- The first correct pick takes the card. A wrong pick is a fault (おてつき) and sits out that question.
+- When someone takes the card, everyone has faulted, or 15 seconds pass, the answer is shown; 2 seconds later the host's device moves on to the next question.
+- Results rank players by cards taken, then fewest faults. The host can start another round in the same room.
+- Questions and choices come from the room's seed, so every device sees the same ones; 2 of the 5 wrong choices are similar-shaped prefectures.
+- No Google account is needed (anonymous sign-in). Anonymous sign-in does not count as logged in, and battles are not saved to records or stamps.
+
+Rooms live at `prefBattles/{code}` in Realtime Database, apart from kanji-quiz's `kanjiBattles` and the others.
+A room is removed when its host leaves, and a room older than a day may be overwritten by anyone.
+
+To enable it, set `FIREBASE_DATABASE_URL` in addition to the four Firebase values (`config.js`, or the same-named environment variable / GitHub Variable).
+Without it, the battle button is not shown. In the Firebase console:
+
+1. Realtime Database → Rules: add the `prefBattles` entry from `database.rules.json`. A database has one set of rules, so place it
+   side by side with the other apps' entries (`kanjiBattles`, `mathBattles`, `battles`) inside the single `"rules"` object.
+2. Authentication → Sign-in method: enable Anonymous.
+
+Answers are checked on each device, so cheating can't be fully prevented; it's meant for friends and family.
 
 ## ⚙️ Analytics (Google tag)
 

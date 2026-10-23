@@ -33,6 +33,14 @@ export interface AuthPort {
  * synced: Firestore と同じになっている
  * offline: 送れていない変更がある (つながったら送る)
  */
+/**
+ * ログインしている人の uid。たいせん のための匿名ログインは、ログインしていないものとして扱う
+ * (記録は今までどおり この端末だけに残し、「きろくを うつしますか？」も聞かない)
+ */
+export function accountUid(user: { uid: string; isAnonymous: boolean } | null): string | null {
+  return user && !user.isAnonymous ? user.uid : null;
+}
+
 export type SyncStatus = 'loading' | 'signed-out' | 'syncing' | 'synced' | 'offline';
 
 export interface SyncHooks {

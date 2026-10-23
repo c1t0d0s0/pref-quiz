@@ -1,5 +1,7 @@
 import { rememberedUid, useStore } from '../core/storage';
 import { firebaseConfig, useEmulator } from './config';
+
+export { battleAvailable } from './config';
 import { Sync, type SyncHooks } from './sync';
 
 /** Firebase の設定が入っているビルドか。入っていなければ、ログインの入り口は出さない */
@@ -24,7 +26,7 @@ export function restoreStore(): void {
 export async function startCloud(hooks: SyncHooks): Promise<void> {
   if (!firebaseConfig) return;
   const { createFirebase } = await import('./firebase');
-  const { remote, auth } = createFirebase(firebaseConfig, useEmulator);
+  const { remote, auth } = createFirebase(useEmulator);
   sync = new Sync(remote, auth, hooks);
   sync.start();
   // 画面をとじる前・かくれる前に、たまっている変更を送っておく

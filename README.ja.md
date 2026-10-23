@@ -14,6 +14,7 @@
   - 1・2年生はひらがな中心の問題で、選択肢の都道府県名にふりがながつきます。高学年ほど形の似た都道府県が選択肢にまざり、むずかしくなります。
   - クリアした日と連続日数は、この端末（localStorage）に保存されます。何回でも挑戦できます。
 - 🔑 **Google でログイン（任意）**: ログインすると記録が Firestore に保存され、ほかのブラウザや端末でも同じ記録で遊べます。ログインしなくても、そのブラウザに保存して遊べます。
+- ⚔️ **シルエット たいせん（オンライン）**: 2〜8人が それぞれの端末から同じ部屋に入り、同じシルエットを見て、正しい都道府県を一番早く選んだ人が札をとります（意味かるた たいせん と同じ遊び方）。選択肢は6つ。部屋には 5けたのコード・QRコード・URL で入れます。Google アカウントはいりません。
 - 📒 **スタンプカード**: 今日のチャレンジをさいごまでやると、その日にスタンプが押されます。学年ごとの月のカレンダーで、1年前までさかのぼって見られます。スタンプの絵は日によって変わる都道府県のシルエットです。
 - 🎮 **選べる3つのゲームモード**:
   - 🗺️ **シルエットクイズ**: 都道府県の形（影絵）を当てるモード
@@ -42,7 +43,9 @@ pref-quiz/
 │   ├── main.ts                 # アプリの起動
 │   ├── App.vue                 # 画面の切りかえ（スタート → クイズ → 結果）・学年・今日のチャレンジの記録
 │   ├── types.ts                # 型（学年・都道府県・問題・クイズ）
+│   ├── battle/battle.ts        # たいせん の決まりごと（問題と6つの選択肢・札・おてつき・順位）
 │   ├── components/
+│   │   ├── battle/             # たいせん の画面（入口・待ち画面・たいせん中・結果）
 │   │   ├── StartScreen.vue     # スタート画面（じゆうに あそぶモードの選択）
 │   │   ├── DailyPanel.vue      # 今日のチャレンジ（学年の選択・クリア状況）
 │   │   ├── QuizScreen.vue      # クイズ画面（タイマー・答えの受けつけ）
@@ -54,9 +57,9 @@ pref-quiz/
 │   │   ├── StampCard.vue       # スタンプカード（月のカレンダー）
 │   │   ├── StampMark.vue       # スタンプ1つ（都道府県のシルエット）
 │   │   └── SparrowIcon.vue     # スズメのキャラクター
-│   ├── cloud/                  # Google ログインと Firestore との同期（Firebase に依存するのは firebase.ts だけ）
+│   ├── cloud/                  # Google ログインと Firestore との同期（firebase.ts）、たいせん の通信（battle-net.ts）
 │   ├── core/                   # 画面に依存しない処理（テストしやすいように分けてある）
-│   │   ├── quiz.ts             # 問題の組み立て・4択の選択肢・称号
+│   │   ├── quiz.ts             # 問題の組み立て・選択肢（4択 / たいせん は6択）・称号
 │   │   ├── daily.ts            # 今日のチャレンジの出題（日付と学年から10問を決める）
 │   │   ├── stamps.ts           # スタンプカードのカレンダー・スタンプの絵
 │   │   ├── storage.ts          # 学年・クリアした日の保存（localStorage）
@@ -74,7 +77,7 @@ pref-quiz/
 ├── public/                     # そのまま公開するファイル（favicon.svg / favicon.ico / apple-touch-icon.png）
 ├── tests/                      # Vitest のテスト（データ・出題・選択肢・クイズ画面）
 ├── vite.config.ts              # Vite の設定・Google のタグの埋め込み・Firebase の設定の読みこみ
-├── firestore.rules / firebase.json  # Firestore のルールとエミュレーターの設定
+├── firestore.rules / database.rules.json / firebase.json  # Firestore・Realtime Database のルールとエミュレーターの設定
 ├── config.example.js           # config.js の見本（config.js は .gitignore 対象）
 └── .github/workflows/deploy.yml  # main への push で GitHub Pages に公開
 ```
@@ -187,12 +190,47 @@ Firestore のルールに `firestore.rules` の内容を設定します (ログ�
 本物の Firebase を使わずに、手元でログインと保存をためせます (Java が必要)。
 
 ```sh
-npx firebase-tools emulators:start --only auth,firestore --project demo-pref-quiz
-FIREBASE_API_KEY=x FIREBASE_AUTH_DOMAIN=localhost FIREBASE_PROJECT_ID=demo-pref-quiz FIREBASE_APP_ID=x FIREBASE_EMULATOR=1 npm run dev
+npx firebase-tools emulators:start --only auth,firestore,database --project demo-pref-quiz
+FIREBASE_API_KEY=x FIREBASE_AUTH_DOMAIN=localhost FIREBASE_PROJECT_ID=demo-pref-quiz FIREBASE_APP_ID=x \
+  FIREBASE_DATABASE_URL=https://demo-pref-quiz-default-rtdb.firebaseio.com FIREBASE_EMULATOR=1 npm run dev
 ```
 
 エミュレーターには Google のログイン画面がないので、ブラウザの開発者ツールで `window.__testUser = 'test-user'` としてから
 「Googleで ログイン」をおすと、その名前のユーザーとしてログインします。
+
+## ⚔️ シルエット たいせん (Firebase Realtime Database)
+
+kanji-quiz の「意味かるた たいせん」と同じしくみの、オンラインの早押し たいせん です。
+
+- ホストが部屋を作り (5・10・20問)、ほかの人は 5けたのコード・QRコード・招待の URL (`?battle=12345`) で入る。2〜8人
+- ホストが スタート を押すと、3.5秒のカウントダウンのあと、全員に同じシルエットと 6つの選択肢が出る
+- 一番早く正解した人が札をとる。まちがえると「おてつき」で、その問題はもう答えられない
+- だれかがとるか、全員がおてつきするか、15秒たつと答えを見せ、2秒後に次の問題になる (進めるのはホストの端末)
+- 結果は、札の多い順 (同じなら おてつきの少ない順)。ホストは「もう一度」で、同じ部屋で次の回を始められる
+- 問題と選択肢は部屋の seed から作るので、どの端末でも同じ。まちがいの選択肢 5つのうち 2つは、形の似ている都道府県
+- Google アカウントはいらない (匿名でログインする)。匿名ログインは「ログイン中」にはならず、記録やスタンプには何も残らない
+
+部屋は Realtime Database の `prefBattles/{コード}` に置きます (kanji-quiz の `kanjiBattles` などとは分けてあります)。
+部屋を作った人が出ると部屋ごと消え、1日以上前の部屋はだれでも上書きできます。
+
+```
+prefBattles/{code}
+  app: 'pref-quiz', hostUid, createdAt, count, version, round, seed, status, startAt, q, qAt
+  players/{seat}: { uid, name, joinedAt, online }
+  takes/{q}: { seat, round, at }      一番早く正解した人 (トランザクションで1人だけ)
+  faults/{q}/{seat}: true             おてつき
+```
+
+使うには、Firebase の 4 つの値に加えて `FIREBASE_DATABASE_URL` を入れます (`config.js` か、同じ名前の環境変数 / GitHub の Variables)。
+入れなければ、たいせん のボタンは出ません。Firebase コンソールでは、次の 2 つを設定します。
+
+1. Realtime Database → ルール に、`database.rules.json` の `prefBattles` を入れる。
+   ルールはデータベースに 1 つだけなので、同じデータベースを使うほかのアプリ (`kanjiBattles`・`mathBattles`・`battles`) の
+   ルールと、1 つの `"rules"` の中に並べて置く
+2. Authentication → ログイン方法 で「匿名」を有効にする
+
+- 名前は 10 文字まで。対戦コードを知っている人にだけ見え、部屋が消えるといっしょに消えます
+- 答え合わせは各端末で行うので、ずるを完全には防げません。友だちや家族どうしで遊ぶためのものです
 
 ## ⚙️ アクセス解析 (Google のタグ)
 

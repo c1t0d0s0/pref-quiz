@@ -3,6 +3,8 @@ export interface FirebaseConfig {
   authDomain: string;
   projectId: string;
   appId: string;
+  /** Realtime Database の URL。あれば たいせん が使える */
+  databaseURL?: string;
 }
 
 declare const __FIREBASE_CONFIG__: FirebaseConfig | null | undefined;
@@ -17,3 +19,6 @@ export const firebaseConfig: FirebaseConfig | null =
 
 /** 手元の Firebase エミュレーターにつなぐか (開発・テスト用) */
 export const useEmulator: boolean = typeof __FIREBASE_EMULATOR__ !== 'undefined' && __FIREBASE_EMULATOR__ === true;
+
+/** たいせん (Realtime Database) が使えるビルドか。使えなければ、たいせん のボタンは出さない */
+export const battleAvailable: boolean = !!firebaseConfig?.databaseURL;

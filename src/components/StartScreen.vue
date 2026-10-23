@@ -1,6 +1,7 @@
 <!-- スタート画面: 今日のチャレンジと、じゆうに あそぶモードの選択 -->
 <script setup lang="ts">
 import { ref } from 'vue';
+import { battleAvailable } from '../cloud';
 import { QUIZ_LENGTH, TIME_LIMIT } from '../core/quiz';
 import type { DailyRecord } from '../core/storage';
 import type { Grade, Mode } from '../types';
@@ -10,7 +11,7 @@ import SparrowIcon from './SparrowIcon.vue';
 type FreeMode = Exclude<Mode, 'daily'>;
 
 const props = defineProps<{ grade: Grade; record: DailyRecord; today: string; questionCount: number }>();
-const emit = defineEmits<{ 'update:grade': [grade: Grade]; start: [mode: Mode]; stamps: [] }>();
+const emit = defineEmits<{ 'update:grade': [grade: Grade]; start: [mode: Mode]; stamps: []; battle: [] }>();
 
 // 問題数は 100 問単位で「○○問+」と表示する (問題を足しても書きかえなくてよいように)
 const roundedCount = `${Math.floor(props.questionCount / 100) * 100}問+`;
@@ -89,6 +90,10 @@ const selected = ref<FreeMode>('silhouette');
 
         <button type="button" class="btn btn-primary pulse-btn" @click="emit('start', selected)">
           <span>クイズをはじめる！</span> 🚀
+        </button>
+        <!-- ともだちと オンラインで たいせん (Realtime Database の設定があるビルドだけ) -->
+        <button v-if="battleAvailable" type="button" class="battle-open-btn" @click="emit('battle')">
+          ⚔️ ともだちと シルエット たいせん
         </button>
       </div>
     </div>
