@@ -37,15 +37,18 @@ const selected = ref<FreeMode>('silhouette');
 
     <!-- PC では 左に今日のチャレンジ、右に じゆうに あそぶ をならべる (縦にスクロールしなくてよいように) -->
     <div class="start-columns">
-      <DailyPanel
-        :grade="grade"
-        :record="record"
-        :today="today"
-        @update:grade="emit('update:grade', $event)"
-        @start="emit('start', 'daily')"
-        @stamps="emit('stamps')"
-        @cards="emit('cards')"
-      />
+      <div class="daily-column">
+        <DailyPanel
+          :grade="grade"
+          :record="record"
+          :today="today"
+          @update:grade="emit('update:grade', $event)"
+          @start="emit('start', 'daily')"
+          @stamps="emit('stamps')"
+        />
+        <!-- 都道府県カードは、今日のチャレンジでも じゆうに あそぶ でも もらえるので、黄色い わくの外に置く -->
+        <button type="button" class="stamp-link cards-link" @click="emit('cards')">🎴 都道府県カードを 見る</button>
+      </div>
 
       <div class="free-play">
         <div class="free-play-title">🎮 じゆうに あそぶ</div>

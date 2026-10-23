@@ -22,8 +22,9 @@ export function ownedCards(progress: CardProgress | undefined): number[] {
 
 /**
  * クイズの答えから、正解した分を記録に足す (record は書きかえず、新しい記録を返す)。
- * シルエット問題は、えらんでいる学年 (grade) の正解にする。
- * ちしき問題は、その問題の学年の正解にする (学年に合った問題に答えたときだけ、その学年のカードに近づく)
+ * シルエット問題も ちしき問題も、えらんでいる学年 (grade) の正解にする。
+ * じゆうに あそぶ の ちしき問題は全学年から出るが、どの問題に正解しても、えらんでいる学年のカードに近づく
+ * (今日のチャレンジをしなくても、じゆうに あそぶ だけで カードが集まるように)
  */
 export function addAnswers(record: CardRecord, answers: readonly AnswerRecord[], grade: Grade): CardRecord {
   const out: CardRecord = {};
@@ -33,9 +34,8 @@ export function addAnswers(record: CardRecord, answers: readonly AnswerRecord[],
   }
   for (const a of answers) {
     if (!a.correct) continue;
-    const g = a.item.type === 'silhouette' ? grade : a.item.question.grade;
     const kind = a.item.type === 'silhouette' ? 'silhouette' : 'knowledge';
-    const p = (out[g] ??= { silhouette: [], knowledge: [] });
+    const p = (out[grade] ??= { silhouette: [], knowledge: [] });
     p[kind] = sortedUnion(p[kind], [a.item.answer.id]);
   }
   return out;

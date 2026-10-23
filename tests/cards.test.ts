@@ -39,11 +39,11 @@ describe('カードをもらう決まり', () => {
     expect(newCards(second, addAnswers(second, [silhouette(26), knowledge(26, 4)], 4))).toEqual([]);
   });
 
-  it('シルエットは えらんでいる学年、ちしきは 問題の学年の カードに近づく', () => {
+  it('ちしき問題は ほかの学年の問題でも、えらんでいる学年の カードに近づく (じゆうに あそぶ だけでも集まる)', () => {
     const record = addAnswers({}, [silhouette(47), knowledge(47, 6)], 2);
-    expect(record[2]).toEqual({ silhouette: [47], knowledge: [] });
-    expect(record[6]).toEqual({ silhouette: [], knowledge: [47] });
-    expect(ownedCards(record[2])).toEqual([]);
+    expect(record[2]).toEqual({ silhouette: [47], knowledge: [47] });
+    expect(record[6]).toBeUndefined();
+    expect(ownedCards(record[2])).toEqual([47]);
   });
 
   it('もとの記録は書きかえない', () => {

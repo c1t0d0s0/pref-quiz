@@ -2271,3 +2271,35 @@ body {
         font-size: 0.85rem;
     }
 }
+
+/* 今日のチャレンジの わくと、その下の 都道府県カードへの入り口 */
+.daily-column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.daily-column .daily-panel {
+    margin-bottom: 0;
+}
+
+@media (min-width: 960px) {
+    .daily-column {
+        margin-bottom: 0;
+    }
+
+    /* 右の列と高さをそろえる (わくが のびて、入り口は いちばん下) */
+    .daily-column .daily-panel {
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .daily-column {
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+}
