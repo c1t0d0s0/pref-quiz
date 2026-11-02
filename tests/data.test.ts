@@ -35,6 +35,25 @@ describe('ちしき問題', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('問題文に、答えの都道府県の名前 (漢字・ひらがな) が入っていない (「熊本城」のように答えがわかってしまうため)', () => {
+    // 「しがらきやき (信楽焼)」の「しが」のように、べつの言葉の一部として たまたま ふくまれるもの
+    const allowed: Record<number, string> = { 817: 'しがらき' };
+    const base = (s: string, suffixes: string[]) => {
+      const suffix = suffixes.find((x) => s.endsWith(x) && s !== '北海道');
+      return suffix ? s.slice(0, -suffix.length) : s;
+    };
+    for (const q of QUESTIONS) {
+      const pref = PREFECTURES.find((p) => p.id === q.prefId)!;
+      // 「東京都」は 京都府の「京都」を ふくむので、先に のぞいておく
+      const text = q.question.replace(/東京都/g, '');
+      const names = [base(pref.name, ['都', '府', '県']), base(pref.kana, ['けん', 'ふ', 'と'])];
+      for (const name of names) {
+        if (allowed[q.id] && q.question.includes(allowed[q.id])) continue;
+        expect(text.includes(name), `id ${q.id} (${pref.name}): ${q.question}`).toBe(false);
+      }
+    }
+  });
+
   it('prefId と prefName が合っている', () => {
     const names = new Map(PREFECTURES.map((p) => [p.id, p.name]));
     for (const q of QUESTIONS) expect(q.prefName, `id ${q.id}`).toBe(names.get(q.prefId));
