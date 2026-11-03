@@ -19,10 +19,10 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 - 🎴 **Prefecture Cards (都道府県カード)**: Answer both a silhouette question and a knowledge question about the same prefecture correctly (in any quizzes, not necessarily the same one) to earn that prefecture's card. Cards show the silhouette with a frame color per grade, and are collected per grade (47 each). Both silhouette and knowledge answers count for the grade selected in the daily challenge panel, so free play alone is enough to collect cards. Battles don't count.
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
-  - 💡 **Knowledge Quiz (ちしき)**: 760+ trivia questions covering geography, landmarks, specialties, population, and records.
+  - 💡 **Knowledge Quiz (ちしき)**: 1,000+ trivia questions covering geography, landmarks, specialties, population, and records.
   - 🌟 **Mix Quiz (ミックス)**: A fun 10-question random combination of silhouette and knowledge questions.
 - 🗺️ **47 Japanese Prefecture SVG Silhouettes**: High-resolution, smooth SVG vector shapes for all 47 prefectures in Japan.
-- 📚 **Per-Grade Question Data**: 768 knowledge questions kept in one JSON file per school grade (`src/data/questions/grade1.json` … `grade6.json`).
+- 📚 **Per-Grade Question Data**: 1,051 knowledge questions kept in one JSON file per school grade (`src/data/questions/grade1.json` … `grade6.json`).
 - 🎯 **10-Question Random Quiz**: Each session presents 10 questions with a 30-second countdown timer.
 - 🧠 **Smart Shape-Similarity Algorithm**: Distractor options are intelligently picked based on shape similarity to provide a fun and challenging experience.
 - 🎨 **Chalkboard Design**: A wooden-framed chalkboard look with handwritten fonts ([Klee One](https://fonts.google.com/specimen/Klee+One), [Yomogi](https://fonts.google.com/specimen/Yomogi)) and a sparrow mascot.
