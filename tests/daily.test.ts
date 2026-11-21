@@ -25,8 +25,9 @@ describe.each(GRADES)('%i年生', (grade) => {
     expect(ids(grade, '2026-11-03')).toEqual(ids(grade, '2026-11-03'));
   });
 
-  it('同じ問題がまた出るまでに、少なくとも問題数の半分ぶんの日数があく', () => {
-    const minGapDays = Math.floor(Math.floor(size / 2) / DAILY_LENGTH);
+  it('同じ問題がまた出るまでに、少なくとも一めぐりの 3/4 ぶんの日数があく', () => {
+    const minGap = size - Math.floor(size / 4) - 1; // 問題の数 (巡のさかいで1つ先に送られることがあるので 1 引く)
+    const minGapDays = Math.floor(minGap / DAILY_LENGTH);
     const lastSeen = new Map<number, number>();
     for (let i = 0; i < DAYS; i++) {
       for (const id of ids(grade, addDays(START, i))) {
@@ -52,6 +53,17 @@ describe.each(GRADES)('%i年生', (grade) => {
       if (new Set(picked.map((q) => q.prefId)).size !== picked.length) samePrefDays++;
     }
     expect(samePrefDays).toBeLessThanOrEqual(DAYS * 0.02);
+  });
+
+  it('きのうと同じ都道府県が答えの問題が出る日は、ほとんどない', () => {
+    let repeatDays = 0;
+    let yesterday = new Set<number>();
+    for (let i = 0; i < DAYS; i++) {
+      const today = new Set(dailyQuestions(QUESTIONS, grade, addDays(START, i)).map((q) => q.prefId));
+      if ([...today].some((id) => yesterday.has(id))) repeatDays++;
+      yesterday = today;
+    }
+    expect(repeatDays).toBeLessThanOrEqual(DAYS * 0.02);
   });
 });
 

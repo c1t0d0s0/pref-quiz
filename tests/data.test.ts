@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { PREFECTURES, QUESTIONS, shapeOf, SIMILAR } from '../src/data';
 import { GRADES } from '../src/types';
 
-const MIN_PER_GRADE = 100;
+/** 1つの学年・1つの都道府県あたりの問題数 (今日のチャレンジで 同じ問題が すぐに 出てこないように) */
+const MIN_PER_PREFECTURE = 10;
 const REQUIRED = ['id', 'prefId', 'prefName', 'category', 'question', 'explanation'] as const;
 
 describe('都道府県データ', () => {
@@ -65,7 +66,15 @@ describe('ちしき問題', () => {
     for (const p of PREFECTURES) expect(prefs.has(p.id), p.name).toBe(true);
   });
 
-  it.each(GRADES)(`%i年生の問題が ${MIN_PER_GRADE} 問以上ある`, (grade) => {
-    expect(QUESTIONS.filter((q) => q.grade === grade).length).toBeGreaterThanOrEqual(MIN_PER_GRADE);
+  it.each(GRADES)(`%i年生は どの都道府県も ${MIN_PER_PREFECTURE} 問以上ある`, (grade) => {
+    for (const p of PREFECTURES) {
+      const count = QUESTIONS.filter((q) => q.grade === grade && q.prefId === p.id).length;
+      expect(count, `${grade}年生 ${p.name}`).toBeGreaterThanOrEqual(MIN_PER_PREFECTURE);
+    }
+  });
+
+  it.each(GRADES)('%i年生の中で 同じ問題文が ない', (grade) => {
+    const texts = QUESTIONS.filter((q) => q.grade === grade).map((q) => q.question);
+    expect(texts.length - new Set(texts).size).toBe(0);
   });
 });

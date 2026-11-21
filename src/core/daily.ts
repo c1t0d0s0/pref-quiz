@@ -6,64 +6,71 @@ import { rngFromString, shuffle } from './rng';
 
 export const DAILY_LENGTH = 10;
 
+/** 同じ問題の間は、少なくとも一巡の (1 − GAP_SLACK) ぶんあける (470問なら約35日) */
+const GAP_SLACK = 1 / 4;
+/** 直前のこれだけの問題 (今日と昨日の2日分) には、同じ都道府県が答えの問題をなるべく置かない */
+const PREF_WINDOW = DAILY_LENGTH * 2;
+
 /**
  * 学年の問題を cycle 巡目の順にならべる。
- * 問題を前半と後半の2組に分け (分け方はいつも同じ)、巡ごとにそれぞれの組の中だけでならべかえる。
- * こうすると、巡のさかいをまたいでも、同じ問題がまた出るまでに少なくとも半分の問題がはさまる。
- * before は前の巡のさいごの問題たち。巡のさかいの日にも、答えの都道府県が重ならないようにするために使う
+ * 前から1つずつ、置ける問題の中から種つき乱数で選んで置く。
+ * - 前の巡で q 番目だった問題は、q − n/4 番目より前には置かない。
+ *   こうすると、同じ問題がまた出るまでに、いつも一巡の 3/4 以上の問題がはさまる
+ * - 直前の20問 (今日と昨日) に同じ都道府県が答えの問題があるものは、なるべく選ばない。
+ *   それができなければ直前の10問 (同じ日)、それもできなければ どれでもよい
+ * - その中では、まだ置いていない問題の多い都道府県を先に選ぶ
+ * previous は前の巡 (0 巡目なら null)
  */
 function deckOrder(
   questions: readonly KnowledgeQuestion[],
   grade: Grade,
   cycle: number,
-  before: readonly KnowledgeQuestion[],
+  previous: readonly KnowledgeQuestion[] | null,
 ): KnowledgeQuestion[] {
-  const base = shuffle(questions, rngFromString(`deck-g${grade}`));
-  const half = Math.ceil(base.length / 2);
+  const n = questions.length;
+  const slack = Math.floor(n * GAP_SLACK);
+  const earliest = new Map<KnowledgeQuestion, number>();
+  previous?.forEach((q, i) => earliest.set(q, Math.max(0, i - slack)));
   const rng = rngFromString(`deck-g${grade}#${cycle}`);
-  const order = [...before, ...shuffle(base.slice(0, half), rng), ...shuffle(base.slice(half), rng)];
-  // 前半・後半それぞれの中で、答えの都道府県が近くで重ならないようにならべなおす
-  spreadPrefectures(order, before.length, before.length + half);
-  spreadPrefectures(order, before.length + half, order.length);
-  return order.slice(before.length);
-}
 
-/**
- * order[from, to) の中で、となりあう10問 (1日分) に同じ都道府県が答えの問題が入らないように、
- * ほかの問題と入れかえる。入れかえられる問題がなければ、そのままにする
- */
-function spreadPrefectures(order: KnowledgeQuestion[], from: number, to: number): void {
-  const clashes = (i: number, prefId: number) => {
-    for (let k = Math.max(0, i - DAILY_LENGTH + 1); k < i; k++) {
-      if (order[k].prefId === prefId) return true;
+  // 前の巡のおわりの問題も、都道府県の重なりを見るときに使う (巡のさかいの日のため)
+  const order: KnowledgeQuestion[] = previous ? previous.slice(-(PREF_WINDOW - 1)) : [];
+  const offset = order.length;
+  const unused = new Set(questions);
+  const clashes = (q: KnowledgeQuestion, window: number) => {
+    for (let k = Math.max(0, order.length - window + 1); k < order.length; k++) {
+      if (order[k].prefId === q.prefId) return true;
     }
     return false;
   };
-  for (let i = from; i < to; i++) {
-    if (!clashes(i, order[i].prefId)) continue;
-    for (let j = i + 1; j < to; j++) {
-      if (!clashes(i, order[j].prefId)) {
-        [order[i], order[j]] = [order[j], order[i]];
-        break;
-      }
+
+  // 都道府県ごとの、まだ置いていない問題の数
+  const left = new Map<number, number>();
+  for (const q of questions) left.set(q.prefId, (left.get(q.prefId) ?? 0) + 1);
+  // 残りの多い都道府県から先に置く (同じ都道府県の問題が巡のおわりにかたまらないように)。同じ数なら乱数で選ぶ
+  const pick = (list: KnowledgeQuestion[]) => {
+    let best: KnowledgeQuestion[] = [];
+    let most = -1;
+    for (const q of list) {
+      const count = left.get(q.prefId)!;
+      if (count > most) {
+        most = count;
+        best = [q];
+      } else if (count === most) best.push(q);
     }
-  }
-  // おわりのほうは入れかえる相手が少なく重なりが残りやすいので、前のほうの問題とも入れかえてみる
-  const fits = (pos: number, prefId: number, skip: number) => {
-    for (let k = Math.max(0, pos - DAILY_LENGTH + 1); k < Math.min(to, pos + DAILY_LENGTH); k++) {
-      if (k !== pos && k !== skip && order[k].prefId === prefId) return false;
-    }
-    return true;
+    return best[Math.floor(rng() * best.length)];
   };
-  for (let i = from; i < to; i++) {
-    if (fits(i, order[i].prefId, -1)) continue;
-    for (let j = from; j < to; j++) {
-      if (j !== i && fits(i, order[j].prefId, j) && fits(j, order[i].prefId, i)) {
-        [order[i], order[j]] = [order[j], order[i]];
-        break;
-      }
-    }
+
+  for (let pos = 0; pos < n; pos++) {
+    const ready = [...unused].filter((q) => (earliest.get(q) ?? 0) <= pos);
+    const fresh = ready.filter((q) => !clashes(q, PREF_WINDOW));
+    const sameDayFree = fresh.length > 0 ? fresh : ready.filter((q) => !clashes(q, DAILY_LENGTH));
+    const chosen = pick(sameDayFree.length > 0 ? sameDayFree : ready);
+    unused.delete(chosen);
+    left.set(chosen.prefId, left.get(chosen.prefId)! - 1);
+    order.push(chosen);
   }
+  return order.slice(offset);
 }
 
 // 巡は前の巡のさいごに合わせてならべるので、0 巡目から順に作る。作った巡はとっておいて使いまわす
@@ -71,7 +78,7 @@ const deckCache = new Map<string, KnowledgeQuestion[][]>();
 
 /**
  * その学年の今日の10問。day 日目は、列の day × 10 番目から10問。
- * 100問ある学年なら、10日で全部の問題が1回ずつ出る
+ * 470問ある学年なら、47日で全部の問題が1回ずつ出る
  */
 export function dailyQuestions(pool: readonly KnowledgeQuestion[], grade: Grade, date: string): KnowledgeQuestion[] {
   const questions = pool.filter((q) => q.grade === grade).sort((a, b) => a.id - b.id);
@@ -83,10 +90,7 @@ export function dailyQuestions(pool: readonly KnowledgeQuestion[], grade: Grade,
   const decks = deckCache.get(key) ?? [];
   deckCache.set(key, decks);
   const deck = (cycle: number) => {
-    for (let c = decks.length; c <= cycle; c++) {
-      const before = c === 0 ? [] : decks[c - 1].slice(-(DAILY_LENGTH - 1));
-      decks.push(deckOrder(questions, grade, c, before));
-    }
+    for (let c = decks.length; c <= cycle; c++) decks.push(deckOrder(questions, grade, c, c === 0 ? null : decks[c - 1]));
     return decks[cycle];
   };
 

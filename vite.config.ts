@@ -111,12 +111,13 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       output: {
-        // 問題・シルエットのデータ (約 650 kB) はアプリのコードと別のファイルにする。
+        // 問題・シルエットのデータ (約 1.3 MB、gzip で 約 330 kB) はアプリのコードと別のファイルにする。
         // コードだけ直したときは、データをダウンロードしなおさなくてよい
         codeSplitting: { groups: [{ name: 'data', test: /src[\\/]data[\\/]/ }] },
       },
     },
-    chunkSizeWarningLimit: 800,
+    // データのファイルは 大きくても よい (各学年 470問)。アプリのコードが 大きく なりすぎたときだけ 気づけるように する
+    chunkSizeWarningLimit: 1500,
   },
   test: {
     environment: 'jsdom',

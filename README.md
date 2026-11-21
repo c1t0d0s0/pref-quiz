@@ -10,7 +10,8 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 
 - 📅 **Daily Challenge by Grade (今日のチャレンジ)**: Pick a school grade (1–6) and get 10 grade-appropriate questions every day.
   - The same date and grade always give the same 10 questions for everyone (the date changes at midnight JST).
-  - Each grade has 100+ questions; no question repeats until the whole set has been used, and no prefecture is the answer twice on the same day.
+  - Each grade has 470 questions (10 per prefecture); no question repeats until the whole set has been used (about 47 days).
+  - A question never comes back within three quarters of a round (about 35 days), and the same prefecture is not the answer on the same day or on two days in a row.
   - Grades 1–2 use mostly hiragana and show furigana on the choices; upper grades mix in similar-shaped prefectures as wrong choices.
   - Cleared days and the current streak are saved in this browser (localStorage). Replays are allowed.
 - 🔑 **Optional Google Login**: Logged-in players' records are saved to Firestore and follow them across browsers and devices; without login, records stay in the browser.
@@ -19,10 +20,10 @@ A bright, pop, and fun web-based educational quiz application designed for eleme
 - 🎴 **Prefecture Cards (都道府県カード)**: Answer both a silhouette question and a knowledge question about the same prefecture correctly (in any quizzes, not necessarily the same one) to earn that prefecture's card. Cards show the silhouette with a frame color per grade, and are collected per grade (47 each). Both silhouette and knowledge answers count for the grade selected in the daily challenge panel, so free play alone is enough to collect cards. Battles don't count.
 - 🎮 **3 Game Modes**:
   - 🗺️ **Silhouette Quiz (シルエット)**: Guess the prefecture from its vector shape silhouette.
-  - 💡 **Knowledge Quiz (ちしき)**: 1,000+ trivia questions covering geography, landmarks, specialties, population, and records.
+  - 💡 **Knowledge Quiz (ちしき)**: 2,800+ trivia questions covering geography, landmarks, specialties, population, and records.
   - 🌟 **Mix Quiz (ミックス)**: A fun 10-question random combination of silhouette and knowledge questions.
 - 🗺️ **47 Japanese Prefecture SVG Silhouettes**: High-resolution, smooth SVG vector shapes for all 47 prefectures in Japan.
-- 📚 **Per-Grade Question Data**: 1,051 knowledge questions kept in one JSON file per school grade (`src/data/questions/grade1.json` … `grade6.json`).
+- 📚 **Per-Grade Question Data**: 2,820 knowledge questions (470 per grade) kept in one JSON file per school grade (`src/data/questions/grade1.json` … `grade6.json`).
 - 🎯 **10-Question Random Quiz**: Each session presents 10 questions with a 30-second countdown timer.
 - 🧠 **Smart Shape-Similarity Algorithm**: Distractor options are intelligently picked based on shape similarity to provide a fun and challenging experience.
 - 🎨 **Chalkboard Design**: A wooden-framed chalkboard look with handwritten fonts ([Klee One](https://fonts.google.com/specimen/Klee+One), [Yomogi](https://fonts.google.com/specimen/Yomogi)) and a sparrow mascot.
@@ -102,7 +103,7 @@ Add entries to the file for the grade that should get the question, `src/data/qu
 - `prefId` is the answer prefecture's `id` from `src/data/prefectures.json`, and `prefName` is its name.
 - The answer is always a prefecture. Prefectures mentioned in the question text are never used as wrong choices.
 
-Run `npm test` afterwards. It checks required fields, unique `id`s, `prefId`/`prefName` consistency, at least 100 questions per grade, and the daily selection.
+Run `npm test` afterwards. It checks required fields, unique `id`s, `prefId`/`prefName` consistency, at least 10 questions per prefecture in every grade, no duplicate question text within a grade, no answer prefecture named in its own question, and the daily selection.
 Adding or removing questions changes the order of that grade's daily challenge, including today's set, so deploying around midnight JST is best.
 
 ## 🔑 Login and Saving (Firebase)
